@@ -1,0 +1,40 @@
+# Environment variables & secrets (CRITICAL: Never commit credentials)
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# User Uploads & Confidential Attachments
+uploads/*
+!uploads/.gitkeep
+!uploads/.htaccess
+!uploads/index.php
+
+# Logs & Temporary Files
+*.log
+install.lock
+cron/*.lock
+storage/logs/
+
+# Database dumps with sensitive data (keep database.sql as clean schema template)
+*.sql.gz
+dump.sql
+backup*.sql
+
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE & OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/

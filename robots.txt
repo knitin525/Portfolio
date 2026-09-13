@@ -1,0 +1,52 @@
+# Robots.txt for Knitin Portfolio
+# https://knitin525.in
+
+User-agent: *
+Allow: /
+
+# Disallow private directories and sensitive files
+Disallow: /node_modules/
+Disallow: /css/*.min.css
+Disallow: /js/*.min.js
+Disallow: /.env
+Disallow: /.git
+Disallow: /server.js
+
+# Sitemap location
+Sitemap: https://knitin525.in/sitemap.xml
+
+# Crawl-delay (optional - for respectful crawling)
+Crawl-delay: 1
+
+# Common crawl paths to follow
+Allow: /index.html
+Allow: /projects.html
+Allow: /img/
+Allow: /css/
+Allow: /js/
+
+# Specify preferred domain
+Host: https://knitin525.in
+
+# User-agent specific rules
+User-agent: Googlebot
+Allow: /
+Disallow: /node_modules/
+Disallow: /.env
+
+User-agent: Bingbot
+Allow: /
+Disallow: /node_modules/
+Disallow: /.env
+
+User-agent: Yandex
+Allow: /
+Disallow: /node_modules/
+Disallow: /.env
+
+# Bad bots to limit
+User-agent: MJ12bot
+Crawl-delay: 10
+
+User-agent: AhrefsBot
+Crawl-delay: 5

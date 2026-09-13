@@ -74,11 +74,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$isLocked) {
             try {
                 // Test DB connection
                 $dsn = "mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4";
-                $pdo = new PDO($dsn, $dbUser, $dbPass, [
+                $options = [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
-                ]);
+                ];
+                if (defined('PDO::MYSQL_ATTR_INIT_COMMAND')) {
+                    $options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci";
+                }
+                if (defined('PDO::MYSQL_ATTR_MULTI_STATEMENTS')) {
+                    $options[PDO::MYSQL_ATTR_MULTI_STATEMENTS] = true;
+                }
+                $pdo = new PDO($dsn, $dbUser, $dbPass, $options);
+
+                // Safe dynamic schema check if `settings` table already exists with legacy columns
+                try {
+                    $tableCheck = $pdo->query("SHOW TABLES LIKE 'settings'")->fetch();
+                    if ($tableCheck) {
+                        $cols = $pdo->query("SHOW COLUMNS FROM `settings`")->fetchAll(PDO::FETCH_COLUMN, 0);
+                        if (!in_array('setting_key', $cols, true)) {
+                            if (in_array('key', $cols, true)) {
+                                $pdo->exec("ALTER TABLE `settings` CHANGE COLUMN `key` `setting_key` VARCHAR(191) NOT NULL");
+                            } elseif (in_array('setting_name', $cols, true)) {
+                                $pdo->exec("ALTER TABLE `settings` CHANGE COLUMN `setting_name` `setting_key` VARCHAR(191) NOT NULL");
+                            } elseif (in_array('name', $cols, true)) {
+                                $pdo->exec("ALTER TABLE `settings` CHANGE COLUMN `name` `setting_key` VARCHAR(191) NOT NULL");
+                            } elseif (in_array('option_name', $cols, true)) {
+                                $pdo->exec("ALTER TABLE `settings` CHANGE COLUMN `option_name` `setting_key` VARCHAR(191) NOT NULL");
+                            } else {
+                                $pdo->exec("ALTER TABLE `settings` ADD COLUMN `setting_key` VARCHAR(191) NOT NULL AFTER `id`");
+                            }
+                        }
+                        if (!in_array('setting_value', $cols, true)) {
+                            if (in_array('value', $cols, true)) {
+                                $pdo->exec("ALTER TABLE `settings` CHANGE COLUMN `value` `setting_value` LONGTEXT NULL");
+                            } elseif (in_array('option_value', $cols, true)) {
+                                $pdo->exec("ALTER TABLE `settings` CHANGE COLUMN `option_value` `setting_value` LONGTEXT NULL");
+                            } else {
+                                $pdo->exec("ALTER TABLE `settings` ADD COLUMN `setting_value` LONGTEXT NULL AFTER `setting_key`");
+                            }
+                        }
+                        if (!in_array('setting_group', $cols, true)) {
+                            $pdo->exec("ALTER TABLE `settings` ADD COLUMN `setting_group` VARCHAR(100) DEFAULT 'general' AFTER `setting_value`");
+                        }
+                        if (!in_array('created_at', $cols, true)) {
+                            $pdo->exec("ALTER TABLE `settings` ADD COLUMN `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP AFTER `setting_group`");
+                        }
+                        if (!in_array('updated_at', $cols, true)) {
+                            $pdo->exec("ALTER TABLE `settings` ADD COLUMN `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER `created_at`");
+                        }
+                    }
+                } catch (Throwable $migrationEx) {
+                    // Non-fatal, tables will be initialized by database.sql
+                }
 
                 // Read and run database.sql
                 $sqlFile = __DIR__ . '/database.sql';
@@ -87,7 +135,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$isLocked) {
                 }
 
                 $sql = file_get_contents($sqlFile);
-                $pdo->exec($sql);
+                // Strip any CLI DELIMITER directives if present
+                $sql = preg_replace('/^\s*DELIMITER\b.*$/mi', '', $sql);
+
+                // Execute statement by statement for maximum compatibility across MariaDB and MySQL drivers
+                $statements = explode(';', $sql);
+                foreach ($statements as $statement) {
+                    $trimmedStmt = trim($statement);
+                    if ($trimmedStmt === '') continue;
+
+                    // Verify the statement contains executable SQL (not just comments)
+                    $lines = explode("\n", $trimmedStmt);
+                    $hasSql = false;
+                    foreach ($lines as $line) {
+                        $tLine = trim($line);
+                        if ($tLine !== '' && !str_starts_with($tLine, '--') && !str_starts_with($tLine, '#')) {
+                            $hasSql = true;
+                            break;
+                        }
+                    }
+
+                    if ($hasSql) {
+                        $pdo->exec($trimmedStmt);
+                    }
+                }
 
                 // Create or update admin account
                 $passwordHash = password_hash($adminPass, PASSWORD_BCRYPT);

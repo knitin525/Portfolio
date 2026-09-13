@@ -28,141 +28,19 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 -- ----------------------------------------------------------------
--- SECTION 1: SAFE DYNAMIC MIGRATION OF `settings` TABLE
+-- SECTION 1: SETTINGS TABLE (SAFE INITIALIZATION)
 -- ----------------------------------------------------------------
-DELIMITER $$
-
-DROP PROCEDURE IF EXISTS `PortfolioSafeMigrateSettings`$$
-
-CREATE PROCEDURE `PortfolioSafeMigrateSettings`()
-BEGIN
-    DECLARE v_db_name VARCHAR(128);
-    SET v_db_name = DATABASE();
-
-    -- 1. If table `settings` does not exist at all, create it
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.TABLES 
-        WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings'
-    ) THEN
-        CREATE TABLE `settings` (
-            `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            `setting_key` VARCHAR(191) NOT NULL,
-            `setting_value` LONGTEXT NULL,
-            `setting_group` VARCHAR(100) DEFAULT 'general',
-            `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-            `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            UNIQUE KEY `settings_setting_key_unique` (`setting_key`),
-            INDEX `idx_setting_group` (`setting_group`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    ELSE
-        -- 2. Table `settings` already exists. Check and align columns without data loss:
-
-        -- (a) Check `setting_key` column
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.COLUMNS 
-            WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'setting_key'
-        ) THEN
-            -- Check known legacy column names and rename safely
-            IF EXISTS (
-                SELECT 1 FROM information_schema.COLUMNS 
-                WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'key'
-            ) THEN
-                ALTER TABLE `settings` CHANGE COLUMN `key` `setting_key` VARCHAR(191) NOT NULL;
-            ELSEIF EXISTS (
-                SELECT 1 FROM information_schema.COLUMNS 
-                WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'setting_name'
-            ) THEN
-                ALTER TABLE `settings` CHANGE COLUMN `setting_name` `setting_key` VARCHAR(191) NOT NULL;
-            ELSEIF EXISTS (
-                SELECT 1 FROM information_schema.COLUMNS 
-                WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'name'
-            ) THEN
-                ALTER TABLE `settings` CHANGE COLUMN `name` `setting_key` VARCHAR(191) NOT NULL;
-            ELSEIF EXISTS (
-                SELECT 1 FROM information_schema.COLUMNS 
-                WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'option_name'
-            ) THEN
-                ALTER TABLE `settings` CHANGE COLUMN `option_name` `setting_key` VARCHAR(191) NOT NULL;
-            ELSE
-                ALTER TABLE `settings` ADD COLUMN `setting_key` VARCHAR(191) NOT NULL AFTER `id`;
-            END IF;
-        ELSE
-            -- Normalize length and definition
-            ALTER TABLE `settings` MODIFY COLUMN `setting_key` VARCHAR(191) NOT NULL;
-        END IF;
-
-        -- (b) Check `setting_value` column
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.COLUMNS 
-            WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'setting_value'
-        ) THEN
-            IF EXISTS (
-                SELECT 1 FROM information_schema.COLUMNS 
-                WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'value'
-            ) THEN
-                ALTER TABLE `settings` CHANGE COLUMN `value` `setting_value` LONGTEXT NULL;
-            ELSEIF EXISTS (
-                SELECT 1 FROM information_schema.COLUMNS 
-                WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'option_value'
-            ) THEN
-                ALTER TABLE `settings` CHANGE COLUMN `option_value` `setting_value` LONGTEXT NULL;
-            ELSE
-                ALTER TABLE `settings` ADD COLUMN `setting_value` LONGTEXT NULL AFTER `setting_key`;
-            END IF;
-        ELSE
-            ALTER TABLE `settings` MODIFY COLUMN `setting_value` LONGTEXT NULL;
-        END IF;
-
-        -- (c) Check `setting_group` column
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.COLUMNS 
-            WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'setting_group'
-        ) THEN
-            ALTER TABLE `settings` ADD COLUMN `setting_group` VARCHAR(100) DEFAULT 'general' AFTER `setting_value`;
-        END IF;
-
-        -- (d) Check `created_at` column
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.COLUMNS 
-            WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'created_at'
-        ) THEN
-            ALTER TABLE `settings` ADD COLUMN `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP AFTER `setting_group`;
-        END IF;
-
-        -- (e) Check `updated_at` column
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.COLUMNS 
-            WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' AND COLUMN_NAME = 'updated_at'
-        ) THEN
-            ALTER TABLE `settings` ADD COLUMN `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER `created_at`;
-        END IF;
-
-        -- (f) Ensure UNIQUE index on `setting_key` exists
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.STATISTICS 
-            WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' 
-              AND (INDEX_NAME = 'settings_setting_key_unique' OR INDEX_NAME = 'setting_key')
-        ) THEN
-            ALTER TABLE `settings` ADD UNIQUE KEY `settings_setting_key_unique` (`setting_key`);
-        END IF;
-
-        -- (g) Ensure index on `setting_group` exists
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.STATISTICS 
-            WHERE TABLE_SCHEMA = v_db_name AND TABLE_NAME = 'settings' 
-              AND INDEX_NAME = 'idx_setting_group'
-        ) THEN
-            ALTER TABLE `settings` ADD INDEX `idx_setting_group` (`setting_group`);
-        END IF;
-
-    END IF;
-END$$
-
-DELIMITER ;
-
-CALL `PortfolioSafeMigrateSettings`();
-DROP PROCEDURE IF EXISTS `PortfolioSafeMigrateSettings`;
+CREATE TABLE IF NOT EXISTS `settings` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `setting_key` VARCHAR(191) NOT NULL,
+    `setting_value` LONGTEXT NULL,
+    `setting_group` VARCHAR(100) DEFAULT 'general',
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `settings_setting_key_unique` (`setting_key`),
+    INDEX `idx_setting_group` (`setting_group`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------------------------------------------
 -- SECTION 2: ENSURE OTHER APPLICATION TABLES EXIST (NON-DESTRUCTIVE)

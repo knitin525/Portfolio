@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTags = document.getElementById('modalTags');
     const modalRole = document.getElementById('modalRole');
     const modalFocus = document.getElementById('modalFocus');
+    const modalAdditionalWrap = document.getElementById('modalAdditionalWrap');
+    const modalAdditionalCategories = document.getElementById('modalAdditionalCategories');
+    const modalRelatedGrid = document.getElementById('modalRelatedGrid');
 
     // State
     let activeFilter = 'all';
@@ -63,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
-     * Update Dynamic Category Counts
+     * Update Dynamic Category Counts (Considers Primary + Additional Categories)
      */
     function updateCounts() {
         const counts = {
@@ -76,10 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         allCards.forEach(card => {
-            const cat = card.dataset.category;
-            if (counts[cat] !== undefined) {
-                counts[cat]++;
-            }
+            const primaryCat = card.dataset.category || '';
+            const additionals = (card.dataset.additionalCategories || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+
+            Object.keys(counts).forEach(key => {
+                if (key === 'all') return;
+                if (primaryCat === key || additionals.includes(key)) {
+                    counts[key]++;
+                }
+            });
         });
 
         // Update badge DOM
@@ -99,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Filter and Search Evaluation
+     * Filter and Search Evaluation (Supports Primary + Additional Categories)
      */
     function applyFilterAndSearch() {
         const query = searchQuery.trim().toLowerCase();
@@ -108,21 +116,25 @@ document.addEventListener('DOMContentLoaded', () => {
         let directoryVisible = 0;
 
         allCards.forEach(card => {
-            const cat = card.dataset.category || '';
+            const primaryCat = card.dataset.category || '';
+            const additionals = (card.dataset.additionalCategories || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
             const title = (card.dataset.title || '').toLowerCase();
             const industry = (card.dataset.industry || '').toLowerCase();
             const desc = (card.dataset.desc || '').toLowerCase();
             const tags = (card.dataset.tags || '').toLowerCase();
 
-            // Check Category Match
-            const matchesCategory = (activeFilter === 'all') || (cat === activeFilter);
+            // Check Category Match: Appears in Primary Category OR any Additional Category
+            const matchesCategory = (activeFilter === 'all') ||
+                (primaryCat === activeFilter) ||
+                additionals.includes(activeFilter);
 
             // Check Search Query Match
             const matchesSearch = !query ||
                 title.includes(query) ||
                 industry.includes(query) ||
                 desc.includes(query) ||
-                tags.includes(query);
+                tags.includes(query) ||
+                additionals.some(a => a.includes(query));
 
             const isVisible = matchesCategory && matchesSearch;
 
@@ -143,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Handle Featured Grid Visibility
-        // Hide featured section when category is not 'all' or 'web-uiux' (since featured are web-uiux), or if no featured cards match query
         if (featuredHeading && featuredGrid) {
             if (featuredVisible > 0) {
                 featuredHeading.style.display = '';
@@ -217,6 +228,72 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * Calculate 3 Related Projects using the 4-level priority score
+     * Priority:
+     * 1. Same Primary Category (+100)
+     * 2. Shared Additional Categories (+30 each)
+     * 3. Shared Tags (+10 each)
+     * 4. Similar Project Type / Industry (+15)
+     */
+    function getRelatedCards(currentCard, limit = 3) {
+        const currentTitle = (currentCard.dataset.title || '').trim();
+        const currentPrimary = currentCard.dataset.category || '';
+        const currentAdditionals = (currentCard.dataset.additionalCategories || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+        const currentTags = (currentCard.dataset.tags || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+        const currentIndustry = (currentCard.dataset.industry || '').trim().toLowerCase();
+
+        const candidates = [];
+
+        allCards.forEach(otherCard => {
+            const otherTitle = (otherCard.dataset.title || '').trim();
+            if (!otherTitle || otherTitle === currentTitle) {
+                return; // Exclude current project itself
+            }
+
+            let score = 0;
+            const otherPrimary = otherCard.dataset.category || '';
+            const otherAdditionals = (otherCard.dataset.additionalCategories || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+            const otherTags = (otherCard.dataset.tags || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+            const otherIndustry = (otherCard.dataset.industry || '').trim().toLowerCase();
+
+            // 1. Same Primary Category
+            if (otherPrimary === currentPrimary) {
+                score += 100;
+            }
+            if (currentAdditionals.includes(otherPrimary)) {
+                score += 50;
+            }
+
+            // 2. Shared Additional Categories
+            const sharedAdditionals = currentAdditionals.filter(c => otherAdditionals.includes(c));
+            score += sharedAdditionals.length * 30;
+            if (otherAdditionals.includes(currentPrimary)) {
+                score += 40;
+            }
+
+            // 3. Shared Tags
+            const sharedTags = currentTags.filter(t => otherTags.includes(t));
+            score += sharedTags.length * 10;
+
+            // 4. Similar Industry
+            if (currentIndustry && otherIndustry === currentIndustry) {
+                score += 15;
+            }
+
+            candidates.push({
+                card: otherCard,
+                score: score,
+                title: otherTitle,
+                category: otherPrimary,
+                categoryLabel: otherCard.dataset.primaryLabel || (otherCard.querySelector('.project-card__category')?.textContent || '').trim() || categoryMeta[otherPrimary]?.label || 'Project'
+            });
+        });
+
+        candidates.sort((a, b) => b.score - a.score);
+        return candidates.slice(0, limit);
+    }
+
+    /**
      * Project Modal Dialog
      */
     function openModal(card) {
@@ -227,16 +304,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const industry = card.dataset.industry || '';
         const desc = card.dataset.desc || '';
         const tags = (card.dataset.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+        const primaryLabel = card.dataset.primaryLabel || (card.querySelector('.project-card__category')?.textContent || '').trim() || categoryMeta[cat]?.label || 'Project Showcase';
+        const additionalLabels = (card.dataset.additionalLabels || '').split(',').map(s => s.trim()).filter(Boolean);
 
         const meta = categoryMeta[cat] || {
-            label: 'Project Showcase',
+            label: primaryLabel,
             role: 'Design & Development',
             focus: 'Custom Solution'
         };
 
         // Populate Modal Fields
         if (modalTitle) modalTitle.textContent = title;
-        if (modalCategory) modalCategory.textContent = meta.label;
+        if (modalCategory) modalCategory.textContent = primaryLabel;
         if (modalSubtitle) modalSubtitle.textContent = industry || meta.focus;
         if (modalDesc) modalDesc.textContent = desc;
         if (modalRole) modalRole.textContent = meta.role;
@@ -245,6 +324,50 @@ document.addEventListener('DOMContentLoaded', () => {
         // Tags
         if (modalTags) {
             modalTags.innerHTML = tags.map(tag => `<span class="project-modal__tag">${tag}</span>`).join('');
+        }
+
+        // Additional Categories Display
+        if (modalAdditionalWrap && modalAdditionalCategories) {
+            if (additionalLabels.length > 0) {
+                modalAdditionalCategories.innerHTML = additionalLabels.map(label => `
+                    <span class="modal-additional-tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path></svg>
+                        ${label}
+                    </span>
+                `).join('');
+                modalAdditionalWrap.style.display = 'block';
+            } else {
+                modalAdditionalWrap.style.display = 'none';
+            }
+        }
+
+        // 3 Related Projects Display
+        if (modalRelatedGrid) {
+            const related = getRelatedCards(card, 3);
+            modalRelatedGrid.innerHTML = related.map(rel => {
+                const imgWrap = rel.card.querySelector('.project-card__image');
+                const imgHtml = imgWrap ? imgWrap.innerHTML : `<div class="project-card__placeholder"><span class="project-card__placeholder-title">${rel.title}</span></div>`;
+                return `
+                    <div class="modal-related-card" data-title="${rel.title}">
+                        <div class="modal-related-card__image">${imgHtml}</div>
+                        <div class="modal-related-card__body">
+                            <span class="modal-related-card__category">${rel.categoryLabel}</span>
+                            <div class="modal-related-card__title" title="${rel.title}">${rel.title}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Attach click listeners to related cards
+            modalRelatedGrid.querySelectorAll('.modal-related-card').forEach(rCard => {
+                rCard.addEventListener('click', () => {
+                    const targetTitle = rCard.dataset.title;
+                    const targetCard = Array.from(allCards).find(c => (c.dataset.title || '').trim() === targetTitle);
+                    if (targetCard) {
+                        openModal(targetCard);
+                    }
+                });
+            });
         }
 
         // Image / Media clone

@@ -226,6 +226,9 @@
 
                 <!-- 1. Mind Intelligence Lab (Featured Hero Card) -->
                 <article class="project-card project-card--hero" data-category="web-uiux"
+                    data-primary-label="Web &amp; UI/UX"
+                    data-additional-categories="web-design,frontend-development,security-technology"
+                    data-additional-labels="Web Design, Front-End Development, Security Technology"
                     data-title="Mind Intelligence Lab"
                     data-industry="Security Technology"
                     data-desc="A premium cybersecurity and behavioral intelligence website experience designed to communicate complex Human Risk Intelligence concepts through clear visual storytelling, refined UI/UX and modern digital presentation."
@@ -581,6 +584,9 @@
 
                 <!-- 13. Dermovent-FP Visual Aid -->
                 <article class="project-card" data-category="pharma"
+                    data-primary-label="Pharma Design"
+                    data-additional-categories="graphics,visual-aid,healthcare-branding"
+                    data-additional-labels="Graphic Design, Visual Aid, Healthcare Branding"
                     data-title="Dermovent-FP Visual Aid"
                     data-industry="Pharmaceutical Visual Communication"
                     data-desc="Professional pharmaceutical visual aid designed with strong product hierarchy, clinical efficacy highlights (Griseofulvin 250mg & Cetirizine HCl 5mg) and medical-grade presentation."
@@ -688,6 +694,9 @@
 
                 <!-- 17. Rampex -->
                 <article class="project-card" data-category="branding"
+                    data-primary-label="Branding &amp; Logo"
+                    data-additional-categories="logo-design,fintech,brand-identity"
+                    data-additional-labels="Logo Design, Fintech, Brand Identity"
                     data-title="Rampex"
                     data-industry="Fintech & Digital Payments"
                     data-desc="A modern fintech logo and visual identity concept for a global card payment gateway supporting multi-currency settlements and digital transaction security."
@@ -1023,7 +1032,27 @@
                     </div>
                 </div>
                 <div class="project-modal__tags" id="modalTags"></div>
-                <div style="display: flex; gap: 12px; align-items: center;">
+
+                <!-- Multi-Category Architecture: Additional Categories Display -->
+                <div class="modal-additional-categories" id="modalAdditionalWrap" style="display: none;">
+                    <div style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 8px;">
+                        Additional Disciplines &amp; Skills
+                    </div>
+                    <div id="modalAdditionalCategories" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+                </div>
+
+                <!-- Related Projects Recommendations (Priority Algorithm: Primary -> Additional -> Tags -> Industry) -->
+                <div class="modal-related-section" id="modalRelatedSection">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: var(--text); margin: 0;">
+                            Related Projects
+                        </h4>
+                        <span style="font-size: 0.72rem; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Top 3 Recommendations</span>
+                    </div>
+                    <div id="modalRelatedGrid" class="modal-related-grid"></div>
+                </div>
+
+                <div style="display: flex; gap: 12px; align-items: center; margin-top: 24px;">
                     <a href="index.html#contact" class="btn btn-primary btn-sm">
                         Inquire About Similar Project
                     </a>

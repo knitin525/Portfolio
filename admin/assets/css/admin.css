@@ -902,7 +902,33 @@ textarea.form-control {
         padding: 16px;
     }
 
-    .inbox-sender {
-        width: 110px;
-    }
+/* Project and Category Management */
+.badge-primary-cat {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(37, 99, 235, 0.12);
+    color: var(--admin-primary);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+.badge-additional-cat {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: var(--admin-border-light);
+    color: var(--admin-text-muted);
+    border: 1px solid var(--admin-border);
+}
+
+.category-checkbox-item:hover {
+    background: var(--admin-border-light);
 }

@@ -105,6 +105,26 @@ switch ($action) {
         json_response(['success' => true]);
         break;
 
+    case 'toggle_project_featured':
+        require_once dirname(__DIR__) . '/includes/ProjectService.php';
+        $projectId = (int)($_POST['project_id'] ?? 0);
+        if (!$projectId) json_response(['success' => false, 'message' => 'Missing project ID'], 400);
+
+        $ps = new ProjectService($pdo);
+        $result = $ps->toggleFeatured($projectId);
+        json_response(['success' => $result]);
+        break;
+
+    case 'delete_project':
+        require_once dirname(__DIR__) . '/includes/ProjectService.php';
+        $projectId = (int)($_POST['project_id'] ?? 0);
+        if (!$projectId) json_response(['success' => false, 'message' => 'Missing project ID'], 400);
+
+        $ps = new ProjectService($pdo);
+        $result = $ps->deleteProject($projectId);
+        json_response(['success' => $result]);
+        break;
+
     default:
         json_response(['success' => false, 'message' => 'Unknown action.'], 400);
         break;

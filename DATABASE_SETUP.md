@@ -30,6 +30,10 @@ contacts (id: BIGINT UNSIGNED)
 admins (id: BIGINT UNSIGNED, password_hash: BCRYPT)
 email_sync_logs (id: BIGINT UNSIGNED)
 settings (id: BIGINT UNSIGNED, setting_key: VARCHAR(191) UNIQUE, setting_value: LONGTEXT)
+
+project_categories (id: BIGINT UNSIGNED, name: VARCHAR(150), slug: VARCHAR(191) UNIQUE)
+   ├── projects (id: BIGINT UNSIGNED, primary_category_id -> project_categories.id)
+   └── project_category_map (project_id -> projects.id, category_id -> project_categories.id)
 ```
 
 ---

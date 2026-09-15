@@ -9,8 +9,17 @@ $pageTitle = 'Dashboard Overview';
 $activeNav = 'dashboard';
 
 require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__) . '/includes/ProjectService.php';
 
 $pdo = db();
+
+// Project Stats
+$projectService = new ProjectService($pdo);
+$totalProjects = $projectService->getProjectCount();
+$publishedProjects = $projectService->getProjectCount(['status' => 'published']);
+$draftProjects = $projectService->getProjectCount(['status' => 'draft']);
+$featuredProjects = $projectService->getProjectCount(['is_featured' => 1]);
+$totalCategories = count($projectService->getCategories(true));
 
 // Fetch metrics
 $totalContacts = (int)$pdo->query("SELECT COUNT(*) FROM contacts")->fetchColumn();
@@ -96,6 +105,64 @@ $lastSyncTime = $lastSyncStmt->fetchColumn() ?: null;
         <div class="stat-meta">
             <div class="stat-label">Sent Messages</div>
             <div class="stat-value"><?= $sentEmails ?></div>
+        </div>
+    </div>
+</div>
+
+<!-- Project Portfolio Stats -->
+<div class="card" style="margin-bottom: 24px;">
+    <div class="card-header">
+        <div class="card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: -3px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            Portfolio Projects
+        </div>
+        <a href="projects.php" class="btn btn-outline btn-sm">Manage Projects &rarr;</a>
+    </div>
+    <div class="stats-grid" style="padding: 16px 20px;">
+        <div class="stat-card">
+            <div class="stat-icon-wrap stat-icon-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            </div>
+            <div class="stat-meta">
+                <div class="stat-label">Total Projects</div>
+                <div class="stat-value" style="color: var(--admin-primary);"><?= $totalProjects ?></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon-wrap stat-icon-emerald">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div class="stat-meta">
+                <div class="stat-label">Published</div>
+                <div class="stat-value" style="color: #10b981;"><?= $publishedProjects ?></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon-wrap stat-icon-amber">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            </div>
+            <div class="stat-meta">
+                <div class="stat-label">Drafts</div>
+                <div class="stat-value" style="color: #f59e0b;"><?= $draftProjects ?></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon-wrap stat-icon-rose">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <div class="stat-meta">
+                <div class="stat-label">Featured</div>
+                <div class="stat-value" style="color: #ef4444;"><?= $featuredProjects ?></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon-wrap stat-icon-cyan">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+            </div>
+            <div class="stat-meta">
+                <div class="stat-label">Categories</div>
+                <div class="stat-value"><?= $totalCategories ?></div>
+            </div>
         </div>
     </div>
 </div>

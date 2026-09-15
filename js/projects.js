@@ -69,14 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
      * Update Dynamic Category Counts (Considers Primary + Additional Categories)
      */
     function updateCounts() {
-        const counts = {
-            'all': allCards.length,
-            'web-uiux': 0,
-            'pharma': 0,
-            'branding': 0,
-            'graphics': 0,
-            'motion': 0
-        };
+        // Dynamically gather categories from filter buttons
+        const counts = {};
+        filterButtons.forEach(btn => {
+            const filter = btn.dataset.filter || 'all';
+            counts[filter] = 0;
+        });
+        counts['all'] = allCards.length;
 
         allCards.forEach(card => {
             const primaryCat = card.dataset.category || '';
@@ -90,20 +89,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Update badge DOM
-        const countMap = {
-            'countAll': counts['all'],
-            'countWeb': counts['web-uiux'],
-            'countPharma': counts['pharma'],
-            'countBranding': counts['branding'],
-            'countGraphics': counts['graphics'],
-            'countMotion': counts['motion']
-        };
-
-        Object.entries(countMap).forEach(([id, val]) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = val;
+        // Update count badges on filter buttons
+        filterButtons.forEach(btn => {
+            const filter = btn.dataset.filter || 'all';
+            const badge = btn.querySelector('.projects-filter-count');
+            if (badge && counts[filter] !== undefined) {
+                badge.textContent = counts[filter];
+            }
         });
+
+        // Also update the countAll element if it exists
+        const countAllEl = document.getElementById('countAll');
+        if (countAllEl) countAllEl.textContent = counts['all'];
     }
 
     /**

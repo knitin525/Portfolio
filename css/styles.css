@@ -388,18 +388,21 @@ input, textarea {
 .logo {
     display: flex;
     align-items: center;
-    font-family: var(--font-heading);
-    font-size: 1.75rem;
-    font-weight: 800;
 }
 
-.logo-text {
-    color: var(--text);
+.logo-img {
+    height: 54px;
+    width: auto;
+    display: block;
+    transition: all 0.3s ease;
 }
 
-.logo-dot {
-    color: var(--primary);
-    font-size: 2rem;
+.navbar.scrolled .logo-img {
+    height: 46px;
+}
+
+.logo:hover .logo-img {
+    opacity: 0.85;
 }
 
 .nav-links {
@@ -2261,8 +2264,9 @@ input, textarea {
     margin-bottom: 16px;
 }
 
-.footer-brand .logo-text {
-    color: white;
+.footer-brand .logo-img {
+    height: 62px;
+    filter: brightness(0) invert(1);
 }
 
 .footer-brand p {
@@ -2362,6 +2366,14 @@ input, textarea {
 }
 
 @media (max-width: 768px) {
+    .logo-img {
+        height: 42px;
+    }
+
+    .navbar.scrolled .logo-img {
+        height: 38px;
+    }
+
     .nav-links,
     .nav-cta {
         display: none;
@@ -2561,14 +2573,8 @@ input, textarea {
     background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
 }
 
-[data-theme="dark"] .logo-text {
-    color: #F7F8FA;
-}
-
-[data-theme="dark"] .logo-dot {
-    background: linear-gradient(135deg, #4F7CFF, #A855F7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+[data-theme="dark"] .logo-img {
+    /* The PNG logo has vibrant gradient colors that work well on dark backgrounds as-is */
 }
 
 [data-theme="dark"] .mobile-menu {

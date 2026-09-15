@@ -336,3 +336,93 @@ INSERT IGNORE INTO `project_category_map` (`project_id`, `category_id`) VALUES
 (3, 13);
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ================================================================
+-- SECTION 5: SAFE ALTER TABLE — NEW PROJECT DETAIL COLUMNS
+-- Non-destructive additions. Safe to re-run multiple times.
+-- Uses MySQL 8+ / MariaDB conditional column add patterns.
+-- ================================================================
+
+-- Helper: Add columns only if they don't exist (MySQL compatible)
+-- Each ALTER is wrapped in a stored procedure for safety.
+
+DELIMITER //
+
+DROP PROCEDURE IF EXISTS safe_add_columns //
+CREATE PROCEDURE safe_add_columns()
+BEGIN
+    -- subtitle
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'subtitle') THEN
+        ALTER TABLE `projects` ADD COLUMN `subtitle` VARCHAR(255) NULL AFTER `title`;
+    END IF;
+
+    -- country
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'country') THEN
+        ALTER TABLE `projects` ADD COLUMN `country` VARCHAR(100) NULL AFTER `industry`;
+    END IF;
+
+    -- project_year
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'project_year') THEN
+        ALTER TABLE `projects` ADD COLUMN `project_year` YEAR NULL AFTER `country`;
+    END IF;
+
+    -- services
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'services') THEN
+        ALTER TABLE `projects` ADD COLUMN `services` TEXT NULL AFTER `project_type`;
+    END IF;
+
+    -- technologies
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'technologies') THEN
+        ALTER TABLE `projects` ADD COLUMN `technologies` TEXT NULL AFTER `services`;
+    END IF;
+
+    -- tools
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'tools') THEN
+        ALTER TABLE `projects` ADD COLUMN `tools` TEXT NULL AFTER `technologies`;
+    END IF;
+
+    -- github_url
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'github_url') THEN
+        ALTER TABLE `projects` ADD COLUMN `github_url` VARCHAR(500) NULL AFTER `project_url`;
+    END IF;
+
+    -- behance_url
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'behance_url') THEN
+        ALTER TABLE `projects` ADD COLUMN `behance_url` VARCHAR(500) NULL AFTER `github_url`;
+    END IF;
+
+    -- demo_url
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'demo_url') THEN
+        ALTER TABLE `projects` ADD COLUMN `demo_url` VARCHAR(500) NULL AFTER `behance_url`;
+    END IF;
+
+    -- case_study_url
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'case_study_url') THEN
+        ALTER TABLE `projects` ADD COLUMN `case_study_url` VARCHAR(500) NULL AFTER `demo_url`;
+    END IF;
+
+    -- seo_title
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'seo_title') THEN
+        ALTER TABLE `projects` ADD COLUMN `seo_title` VARCHAR(255) NULL AFTER `sort_order`;
+    END IF;
+
+    -- seo_description
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'seo_description') THEN
+        ALTER TABLE `projects` ADD COLUMN `seo_description` TEXT NULL AFTER `seo_title`;
+    END IF;
+
+    -- image_alt
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'image_alt') THEN
+        ALTER TABLE `projects` ADD COLUMN `image_alt` VARCHAR(500) NULL AFTER `hero_image`;
+    END IF;
+
+    -- deleted_at (for soft delete / trash)
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects' AND COLUMN_NAME = 'deleted_at') THEN
+        ALTER TABLE `projects` ADD COLUMN `deleted_at` DATETIME NULL AFTER `updated_at`;
+    END IF;
+END //
+
+DELIMITER ;
+
+CALL safe_add_columns();
+DROP PROCEDURE IF EXISTS safe_add_columns;

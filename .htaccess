@@ -1,0 +1,97 @@
+# ================================================================
+# Knitin Portfolio — Apache URL Rewriting & Routing
+# ================================================================
+# Handles clean URLs for the dynamic portfolio CMS:
+#   /projects      → projects.php
+#   /project/slug  → project.php?slug=slug
+#   /              → index.php
+# Redirects old .html URLs to prevent duplicate content.
+# ================================================================
+
+RewriteEngine On
+RewriteBase /
+
+# ----------------------------------------------------------------
+# SECTION 1: HTTPS REDIRECT (Hostinger)
+# ----------------------------------------------------------------
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ----------------------------------------------------------------
+# SECTION 2: REMOVE TRAILING SLASH (except directories)
+# ----------------------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+# ----------------------------------------------------------------
+# SECTION 3: OLD .HTML COMPATIBILITY REDIRECTS
+# ----------------------------------------------------------------
+# Redirect projects.html → /projects (permanent)
+RewriteRule ^projects\.html$ /projects [L,R=301]
+
+# Redirect index.html → / (permanent)
+RewriteRule ^index\.html$ / [L,R=301]
+
+# ----------------------------------------------------------------
+# SECTION 4: CLEAN URL ROUTING
+# ----------------------------------------------------------------
+
+# /projects → projects.php
+RewriteRule ^projects$ projects.php [L,QSA]
+
+# /project/{slug} → project.php?slug={slug}
+RewriteRule ^project/([a-zA-Z0-9_-]+)$ project.php?slug=$1 [L,QSA]
+
+# ----------------------------------------------------------------
+# SECTION 5: DEFAULT INDEX
+# ----------------------------------------------------------------
+# Serve index.php instead of index.html as directory index
+DirectoryIndex index.php index.html
+
+# ----------------------------------------------------------------
+# SECTION 6: PROTECT SENSITIVE FILES
+# ----------------------------------------------------------------
+# Block access to .env, .git, and other sensitive files
+<FilesMatch "^\.env$|^\.git|^\.htaccess$|composer\.(json|lock)$|package(-lock)?\.json$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Block direct access to includes directory
+RewriteRule ^includes/ - [F,L]
+
+# ----------------------------------------------------------------
+# SECTION 7: PREVENT DIRECTORY LISTING
+# ----------------------------------------------------------------
+Options -Indexes
+
+# ----------------------------------------------------------------
+# SECTION 8: SECURITY HEADERS
+# ----------------------------------------------------------------
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ----------------------------------------------------------------
+# SECTION 9: CACHING FOR STATIC ASSETS
+# ----------------------------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType application/x-font-woff "access plus 1 month"
+    ExpiresByType font/woff2 "access plus 1 month"
+</IfModule>
+
+# ----------------------------------------------------------------
+# SECTION 10: PHP ERROR HANDLING (Production)
+# ----------------------------------------------------------------
+php_flag display_errors Off
+php_flag log_errors On

@@ -57,7 +57,11 @@ $categories = $projectService->getCategories();
             Manage projects with exact <strong>One Primary Category</strong> and <strong>Multiple Additional Categories</strong>.
         </p>
     </div>
-    <div style="display: flex; gap: 12px;">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="migrate-projects.php" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;" title="Scan projects.html and import projects">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Import from HTML</span>
+        </a>
         <a href="categories.php" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
             <span>Manage Categories</span>
@@ -231,7 +235,7 @@ $categories = $projectService->getCategories();
                                     <a href="project-edit.php?id=<?= $project['id'] ?>" class="btn btn-secondary btn-sm" style="padding: 6px 10px; font-size: 0.8rem;" title="Edit Project">
                                         Edit
                                     </a>
-                                    <a href="../projects.html" target="_blank" class="btn btn-secondary btn-sm" style="padding: 6px 10px; font-size: 0.8rem;" title="Preview on Frontend">
+                                    <a href="/project/<?= htmlspecialchars($project['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm" style="padding: 6px 10px; font-size: 0.8rem;" title="Preview on Frontend">
                                         View
                                     </a>
                                     <form method="POST" action="projects.php" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete \'<?= htmlspecialchars(addslashes($project['title'])) ?>\'?');">

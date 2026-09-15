@@ -310,6 +310,23 @@ class ProjectService {
         return $project;
     }
 
+    private ?array $projectTableColumns = null;
+
+    /**
+     * Cache and return existing columns in projects table for safe dynamic persistence.
+     */
+    public function getProjectTableColumns(): array {
+        if ($this->projectTableColumns === null) {
+            try {
+                $stmt = $this->pdo->query("SHOW COLUMNS FROM projects");
+                $this->projectTableColumns = $stmt->fetchAll(PDO::FETCH_COLUMN, 0) ?: [];
+            } catch (Throwable $e) {
+                $this->projectTableColumns = [];
+            }
+        }
+        return $this->projectTableColumns;
+    }
+
     /**
      * Save Project with Primary and Additional Categories.
      * Enforces:
@@ -318,6 +335,7 @@ class ProjectService {
      * 3. Automatic deduplication: If Primary Category is selected in Additional Categories,
      *    it is automatically removed.
      * 4. Safe transaction wrapping.
+     * 5. Dynamic support for extended schema columns (subtitle, country, year, services, etc.)
      *
      * @param array $data
      * @param int|null $id
@@ -361,6 +379,23 @@ class ProjectService {
         $status = in_array($data['status'] ?? '', ['draft', 'published', 'archived'], true) ? $data['status'] : 'published';
         $sortOrder = isset($data['sort_order']) ? (int)$data['sort_order'] : 0;
 
+        // Extended optional fields
+        $extraData = [
+            'subtitle' => !empty($data['subtitle']) ? trim($data['subtitle']) : null,
+            'country' => !empty($data['country']) ? trim($data['country']) : null,
+            'project_year' => !empty($data['project_year']) ? (int)$data['project_year'] : null,
+            'services' => !empty($data['services']) ? trim($data['services']) : null,
+            'technologies' => !empty($data['technologies']) ? trim($data['technologies']) : null,
+            'tools' => !empty($data['tools']) ? trim($data['tools']) : null,
+            'github_url' => !empty($data['github_url']) ? trim($data['github_url']) : null,
+            'behance_url' => !empty($data['behance_url']) ? trim($data['behance_url']) : null,
+            'demo_url' => !empty($data['demo_url']) ? trim($data['demo_url']) : null,
+            'case_study_url' => !empty($data['case_study_url']) ? trim($data['case_study_url']) : null,
+            'seo_title' => !empty($data['seo_title']) ? trim($data['seo_title']) : null,
+            'seo_description' => !empty($data['seo_description']) ? trim($data['seo_description']) : null,
+            'image_alt' => !empty($data['image_alt']) ? trim($data['image_alt']) : null,
+        ];
+
         // ---------------------------------------------------------------------
         // SANITIZE ADDITIONAL CATEGORIES
         // Rule: Prevent duplicates, remove primary category from additionals, filter invalid IDs
@@ -388,6 +423,8 @@ class ProjectService {
             $sanitizedAdditional = array_values(array_intersect($sanitizedAdditional, $validDbIds));
         }
 
+        $existingCols = $this->getProjectTableColumns();
+
         // ---------------------------------------------------------------------
         // DATABASE PERSISTENCE TRANSACTION
         // ---------------------------------------------------------------------
@@ -401,42 +438,41 @@ class ProjectService {
                     $slug .= '-' . $id;
                 }
 
-                $updateStmt = $this->pdo->prepare("
-                    UPDATE projects SET
-                        primary_category_id = ?,
-                        title = ?,
-                        slug = ?,
-                        client_name = ?,
-                        industry = ?,
-                        summary = ?,
-                        description = ?,
-                        hero_image = ?,
-                        tags = ?,
-                        project_type = ?,
-                        project_url = ?,
-                        is_featured = ?,
-                        status = ?,
-                        sort_order = ?,
-                        updated_at = NOW()
-                    WHERE id = ?
-                ");
-                $updateStmt->execute([
-                    $primaryCategoryId,
-                    $title,
-                    $slug,
-                    $clientName,
-                    $industry,
-                    $summary,
-                    $description,
-                    $heroImage,
-                    $tags,
-                    $projectType,
-                    $projectUrl,
-                    $isFeatured,
-                    $status,
-                    $sortOrder,
-                    $id
-                ]);
+                $fields = [
+                    'primary_category_id' => $primaryCategoryId,
+                    'title' => $title,
+                    'slug' => $slug,
+                    'client_name' => $clientName,
+                    'industry' => $industry,
+                    'summary' => $summary,
+                    'description' => $description,
+                    'hero_image' => $heroImage,
+                    'tags' => $tags,
+                    'project_type' => $projectType,
+                    'project_url' => $projectUrl,
+                    'is_featured' => $isFeatured,
+                    'status' => $status,
+                    'sort_order' => $sortOrder,
+                ];
+
+                foreach ($extraData as $col => $val) {
+                    if (in_array($col, $existingCols, true)) {
+                        $fields[$col] = $val;
+                    }
+                }
+
+                $setSqlParts = [];
+                $updateValues = [];
+                foreach ($fields as $col => $val) {
+                    $setSqlParts[] = "{$col} = ?";
+                    $updateValues[] = $val;
+                }
+                $setSqlParts[] = "updated_at = NOW()";
+                $updateValues[] = $id;
+
+                $updateSql = "UPDATE projects SET " . implode(', ', $setSqlParts) . " WHERE id = ?";
+                $updateStmt = $this->pdo->prepare($updateSql);
+                $updateStmt->execute($updateValues);
 
                 $projectId = $id;
             } else {
@@ -447,33 +483,39 @@ class ProjectService {
                     $slug .= '-' . time();
                 }
 
-                $insertStmt = $this->pdo->prepare("
-                    INSERT INTO projects (
-                        primary_category_id, title, slug, client_name, industry,
-                        summary, description, hero_image, tags, project_type,
-                        project_url, is_featured, status, sort_order, created_at
-                    ) VALUES (
-                        ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, NOW()
-                    )
-                ");
-                $insertStmt->execute([
-                    $primaryCategoryId,
-                    $title,
-                    $slug,
-                    $clientName,
-                    $industry,
-                    $summary,
-                    $description,
-                    $heroImage,
-                    $tags,
-                    $projectType,
-                    $projectUrl,
-                    $isFeatured,
-                    $status,
-                    $sortOrder
-                ]);
+                $insertFields = [
+                    'primary_category_id' => $primaryCategoryId,
+                    'title' => $title,
+                    'slug' => $slug,
+                    'client_name' => $clientName,
+                    'industry' => $industry,
+                    'summary' => $summary,
+                    'description' => $description,
+                    'hero_image' => $heroImage,
+                    'tags' => $tags,
+                    'project_type' => $projectType,
+                    'project_url' => $projectUrl,
+                    'is_featured' => $isFeatured,
+                    'status' => $status,
+                    'sort_order' => $sortOrder,
+                ];
+
+                foreach ($extraData as $col => $val) {
+                    if (in_array($col, $existingCols, true)) {
+                        $insertFields[$col] = $val;
+                    }
+                }
+
+                $colNames = array_keys($insertFields);
+                $colNames[] = 'created_at';
+                $placeholders = array_fill(0, count($insertFields), '?');
+                $placeholders[] = 'NOW()';
+
+                $insertValues = array_values($insertFields);
+
+                $insertSql = "INSERT INTO projects (" . implode(', ', $colNames) . ") VALUES (" . implode(', ', $placeholders) . ")";
+                $insertStmt = $this->pdo->prepare($insertSql);
+                $insertStmt->execute($insertValues);
 
                 $projectId = (int)$this->pdo->lastInsertId();
             }
@@ -609,6 +651,99 @@ class ProjectService {
     // =========================================================================
     // UTILITY HELPERS
     // =========================================================================
+
+    /**
+     * Get adjacent (previous/next) published projects for navigation.
+     * Uses sort_order ASC, created_at DESC ordering consistent with getProjects().
+     *
+     * @param int $projectId
+     * @return array ['prev' => ?array, 'next' => ?array]
+     */
+    public function getAdjacentProjects(int $projectId): array {
+        $result = ['prev' => null, 'next' => null];
+
+        $current = $this->getProjectById($projectId);
+        if (!$current) {
+            return $result;
+        }
+
+        $sortOrder = (int)$current['sort_order'];
+        $createdAt = $current['created_at'];
+
+        // Previous: lower sort_order, or same sort_order but newer created_at
+        $prevStmt = $this->pdo->prepare("
+            SELECT p.id, p.title, p.slug, p.hero_image, pc.name AS primary_category_name, pc.slug AS primary_category_slug
+            FROM projects p
+            INNER JOIN project_categories pc ON pc.id = p.primary_category_id
+            WHERE p.status = 'published' AND p.id != ?
+              AND (p.sort_order < ? OR (p.sort_order = ? AND p.created_at > ?))
+            ORDER BY p.sort_order DESC, p.created_at ASC
+            LIMIT 1
+        ");
+        $prevStmt->execute([$projectId, $sortOrder, $sortOrder, $createdAt]);
+        $result['prev'] = $prevStmt->fetch() ?: null;
+
+        // Next: higher sort_order, or same sort_order but older created_at
+        $nextStmt = $this->pdo->prepare("
+            SELECT p.id, p.title, p.slug, p.hero_image, pc.name AS primary_category_name, pc.slug AS primary_category_slug
+            FROM projects p
+            INNER JOIN project_categories pc ON pc.id = p.primary_category_id
+            WHERE p.status = 'published' AND p.id != ?
+              AND (p.sort_order > ? OR (p.sort_order = ? AND p.created_at < ?))
+            ORDER BY p.sort_order ASC, p.created_at DESC
+            LIMIT 1
+        ");
+        $nextStmt->execute([$projectId, $sortOrder, $sortOrder, $createdAt]);
+        $result['next'] = $nextStmt->fetch() ?: null;
+
+        return $result;
+    }
+
+    /**
+     * Get only categories that have at least one published project.
+     * Used for the public-facing filter bar.
+     *
+     * @return array
+     */
+    public function getPublishedCategories(): array {
+        $sql = "
+            SELECT DISTINCT c.id, c.name, c.slug, c.display_order
+            FROM project_categories c
+            WHERE c.is_active = 1
+              AND (
+                EXISTS (SELECT 1 FROM projects p WHERE p.primary_category_id = c.id AND p.status = 'published')
+                OR EXISTS (SELECT 1 FROM project_category_map pcm JOIN projects p2 ON p2.id = pcm.project_id WHERE pcm.category_id = c.id AND p2.status = 'published')
+              )
+            ORDER BY c.display_order ASC, c.name ASC
+        ";
+        return $this->pdo->query($sql)->fetchAll();
+    }
+
+    /**
+     * Get project count with optional filters.
+     * Useful for admin dashboard stats.
+     *
+     * @param array $filters [status, is_featured]
+     * @return int
+     */
+    public function getProjectCount(array $filters = []): int {
+        $sql = "SELECT COUNT(*) FROM projects WHERE 1=1";
+        $params = [];
+
+        if (!empty($filters['status'])) {
+            $sql .= " AND status = ?";
+            $params[] = $filters['status'];
+        }
+
+        if (isset($filters['is_featured']) && $filters['is_featured'] !== '') {
+            $sql .= " AND is_featured = ?";
+            $params[] = (int)$filters['is_featured'];
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return (int)$stmt->fetchColumn();
+    }
 
     /**
      * Create URL-safe slug from string.

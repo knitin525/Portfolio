@@ -1,3 +1,32 @@
+<?php
+/**
+ * Knitin Portfolio Ã¢â‚¬â€ Dynamic Homepage
+ * Fetches featured projects from MySQL database via ProjectService.
+ */
+declare(strict_types=1);
+
+require_once __DIR__ . '/includes/ProjectService.php';
+
+$projectService = new ProjectService();
+
+// Fetch featured published projects for homepage (max 6)
+$featuredProjects = $projectService->getProjects([
+    'status' => 'published',
+    'is_featured' => 1,
+    'limit' => 6,
+]);
+
+// Fallback: if no featured projects, show latest published projects
+if (empty($featuredProjects)) {
+    $featuredProjects = $projectService->getProjects([
+        'status' => 'published',
+        'limit' => 6,
+    ]);
+}
+
+// Get categories that have published projects (for filter buttons)
+$publicCategories = $projectService->getPublishedCategories();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -354,7 +383,7 @@
                                 <line x1="12" y1="15" x2="12" y2="3"></line>
                             </svg>
                         </a>
-                        <a href="projects.html" class="link-arrow" aria-label="View all projects">
+                        <a href="/projects" class="link-arrow" aria-label="View all projects">
                             View Portfolio
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -523,7 +552,7 @@
         </div>
     </section>
 
-    <!-- Portfolio / Work Section -->
+    <!-- Portfolio / Work Section Ã¢â‚¬â€ Dynamic from Database -->
     <section class="work-v2" id="portfolio">
         <div class="container">
             <div class="work-v2__header">
@@ -540,354 +569,83 @@
                 <p class="work-v2__desc">Selected projects across web, UI/UX, branding, pharmaceutical design and digital experiences.</p>
             </div>
 
-            <!-- Filter Bar -->
+            <!-- Filter Bar Ã¢â‚¬â€ Dynamic from Database -->
             <div class="work-v2__filters-wrap">
                 <div class="work-v2__filters">
                     <button class="work-v2__filter-btn active" data-filter="all" type="button">All</button>
-                    <button class="work-v2__filter-btn" data-filter="web-uiux" type="button">Web &amp; UI/UX</button>
-                    <button class="work-v2__filter-btn" data-filter="pharma" type="button">Pharma Design</button>
-                    <button class="work-v2__filter-btn" data-filter="branding" type="button">Branding &amp; Logo</button>
-                    <button class="work-v2__filter-btn" data-filter="graphics" type="button">Graphic Design</button>
-                    <button class="work-v2__filter-btn" data-filter="motion" type="button">Motion &amp; Video</button>
+                    <?php foreach ($publicCategories as $cat): ?>
+                        <button class="work-v2__filter-btn" data-filter="<?= htmlspecialchars($cat['slug']) ?>" type="button"><?= htmlspecialchars($cat['name']) ?></button>
+                    <?php endforeach; ?>
                 </div>
             </div>
 
-            <!-- Project Grid -->
+            <!-- Project Grid Ã¢â‚¬â€ Dynamic from Database -->
             <div class="work-v2__grid">
-
-                <!-- 1. Mind Intelligence Lab — FEATURED -->
-                <article class="work-v2__card work-v2__card--featured" data-category="web-uiux">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #2563eb 100%);">
-                        <span class="work-v2__placeholder-text">Mind Intelligence Lab</span>
+                <?php if (empty($featuredProjects)): ?>
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-secondary);">
+                        <p style="font-size: 1.1rem; margin-bottom: 8px;">No projects published yet.</p>
+                        <p style="font-size: 0.9rem;">Projects added from the admin dashboard will appear here automatically.</p>
                     </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Web &amp; UI/UX</span>
-                        <h3 class="work-v2__card-title">Mind Intelligence Lab</h3>
-                        <p class="work-v2__card-desc">Premium Human Risk Intelligence website experience combining behavioral science, security technology and sophisticated UI/UX storytelling.</p>
-                        <div class="work-v2__card-tags">
-                            <span>UI/UX</span>
-                            <span>Security Tech</span>
-                            <span>Web Design</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 2. Dr. Reckeweg India -->
-                <article class="work-v2__card" data-category="web-uiux">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #065f46 0%, #059669 50%, #34d399 100%);">
-                        <span class="work-v2__placeholder-text">Dr. Reckeweg India</span>
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Web &amp; UI/UX</span>
-                        <h3 class="work-v2__card-title">Dr. Reckeweg India</h3>
-                        <p class="work-v2__card-desc">Modern D2C healthcare website redesign concept focused on international brand credibility, product discovery and contemporary digital experience.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Healthcare</span>
-                            <span>UI/UX</span>
-                            <span>E-Commerce</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 3. EPS Electric -->
-                <article class="work-v2__card" data-category="web-uiux">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #78350f 0%, #d97706 50%, #fbbf24 100%);">
-                        <span class="work-v2__placeholder-text">EPS Electric</span>
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Web &amp; UI/UX</span>
-                        <h3 class="work-v2__card-title">EPS Electric</h3>
-                        <p class="work-v2__card-desc">Responsive electrical services website designed around Generac solutions, residential and commercial services, and clear conversion-focused navigation.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Web Design</span>
-                            <span>Responsive</span>
-                            <span>Development</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 4. FJ Group Africa -->
-                <article class="work-v2__card" data-category="web-uiux">
-                    <div class="work-v2__card-image">
-                        <img src="img/work/Web Project/Fj Group Africa/Home 5000x5000.jpg"
-                            alt="FJ Group Africa — Corporate fire-safety website design by Nitin Kumar"
-                            loading="lazy">
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Web &amp; UI/UX</span>
-                        <h3 class="work-v2__card-title">FJ Group Africa</h3>
-                        <p class="work-v2__card-desc">Modern corporate fire-safety website with clean visual hierarchy, responsive layouts and service-focused user experience.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Corporate</span>
-                            <span>UI/UX</span>
-                            <span>Web Development</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 5. OnPoint Prep -->
-                <article class="work-v2__card" data-category="web-uiux">
-                    <div class="work-v2__card-image">
-                        <img src="img/work/Web Project/On Point Prep College/Home.jpg"
-                            alt="OnPoint Prep — Education website redesign by Nitin Kumar"
-                            loading="lazy">
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Web &amp; UI/UX</span>
-                        <h3 class="work-v2__card-title">OnPoint Prep</h3>
-                        <p class="work-v2__card-desc">Education-focused website redesign with modern interfaces, clear service presentation and intuitive navigation.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Education</span>
-                            <span>Web Design</span>
-                            <span>UI/UX</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 6. MedFiles.ai -->
-                <article class="work-v2__card" data-category="web-uiux">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 50%, #818cf8 100%);">
-                        <span class="work-v2__placeholder-text">MedFiles.ai</span>
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Web &amp; UI/UX</span>
-                        <h3 class="work-v2__card-title">MedFiles.ai</h3>
-                        <p class="work-v2__card-desc">Multi-page healthcare technology interface designed around secure medical history storage, organization, sharing and enterprise security.</p>
-                        <div class="work-v2__card-tags">
-                            <span>HealthTech</span>
-                            <span>UI/UX</span>
-                            <span>Front-End</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 7. Teskoq -->
-                <article class="work-v2__card" data-category="web-uiux">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #134e4a 0%, #0d9488 50%, #5eead4 100%);">
-                        <span class="work-v2__placeholder-text">Teskoq</span>
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Web &amp; UI/UX</span>
-                        <h3 class="work-v2__card-title">Teskoq</h3>
-                        <p class="work-v2__card-desc">Modern pharmaceutical corporate website combining product discovery, therapeutic categories and international healthcare brand positioning.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Pharma</span>
-                            <span>Web Design</span>
-                            <span>Development</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 8. Reactive Osmosis RO₂ -->
-                <article class="work-v2__card" data-category="web-uiux">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #38bdf8 100%);">
-                        <span class="work-v2__placeholder-text">Reactive Osmosis RO₂</span>
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Web &amp; UI/UX</span>
-                        <h3 class="work-v2__card-title">Reactive Osmosis RO₂</h3>
-                        <p class="work-v2__card-desc">Product and scientific website concepts for a next-generation residential water purification technology.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Product Design</span>
-                            <span>E-Commerce</span>
-                            <span>UI/UX</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 9. Dermovent-FP Visual Aid -->
-                <article class="work-v2__card" data-category="pharma">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #581c87 0%, #9333ea 50%, #c084fc 100%);">
-                        <span class="work-v2__placeholder-text">Dermovent-FP Visual Aid</span>
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Pharma Design</span>
-                        <h3 class="work-v2__card-title">Dermovent-FP Visual Aid</h3>
-                        <p class="work-v2__card-desc">Professional pharmaceutical visual aid and product communication design created with strong medical-brand hierarchy and product presentation.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Pharma</span>
-                            <span>Visual Aid</span>
-                            <span>Product Design</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 10. Pharmaceutical Packaging -->
-                <article class="work-v2__card" data-category="pharma">
-                    <div class="work-v2__card-image">
-                        <img src="img/work/Pharma Projects/DRT Lifesciences/BoxaGrippal.jpg"
-                            alt="Pharmaceutical packaging design — BoxaGrippal by Nitin Kumar"
-                            loading="lazy">
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Pharma Design</span>
-                        <h3 class="work-v2__card-title">Pharmaceutical Packaging</h3>
-                        <p class="work-v2__card-desc">Selected pharmaceutical packaging, labels and product identity work combining brand differentiation, professional presentation and industry-focused design.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Packaging</span>
-                            <span>Pharma Branding</span>
-                            <span>Print Design</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 11. Rampex Fintech -->
-                <article class="work-v2__card" data-category="branding">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
-                        <span class="work-v2__placeholder-text">Rampex Fintech Identity</span>
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Branding &amp; Logo</span>
-                        <h3 class="work-v2__card-title">Rampex Fintech Identity</h3>
-                        <p class="work-v2__card-desc">Modern fintech logo exploration for a global payment gateway supporting card payments, multi-currency transactions and digital settlements.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Fintech</span>
-                            <span>Logo Design</span>
-                            <span>Brand Identity</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 12. Mary River Wilderness Retreat -->
-                <article class="work-v2__card" data-category="branding">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #14532d 0%, #15803d 50%, #4ade80 100%);">
-                        <span class="work-v2__placeholder-text">Mary River Wilderness Retreat</span>
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Branding &amp; Logo</span>
-                        <h3 class="work-v2__card-title">Mary River Wilderness Retreat</h3>
-                        <p class="work-v2__card-desc">Nature-inspired tourism identity concept combining river landscapes, destination character and a clean contemporary visual language.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Tourism</span>
-                            <span>Logo</span>
-                            <span>Identity</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 13. Parker Chat Identity -->
-                <article class="work-v2__card" data-category="branding">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #7c2d12 0%, #ea580c 50%, #fb923c 100%);">
-                        <span class="work-v2__placeholder-text">Parker Chat Identity</span>
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Branding &amp; Logo</span>
-                        <h3 class="work-v2__card-title">Parker Chat Identity</h3>
-                        <p class="work-v2__card-desc">Friendly digital assistant identity concept inspired by Parker Street, combining guidance, direction and approachable financial communication.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Brand Character</span>
-                            <span>Identity</span>
-                            <span>Concept</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 14. Digital Campaigns & Creatives -->
-                <article class="work-v2__card" data-category="graphics">
-                    <div class="work-v2__card-image">
-                        <img src="img/work/Social Media Posts/Globalist FB 1080X1080 Ad 1 v3.jpg"
-                            alt="Digital campaigns and social media creatives by Nitin Kumar"
-                            loading="lazy">
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Graphic Design</span>
-                        <h3 class="work-v2__card-title">Digital Campaigns &amp; Creatives</h3>
-                        <p class="work-v2__card-desc">A collection of professional social media campaigns, corporate graphics, event creatives and digital marketing assets.</p>
-                        <div class="work-v2__card-tags">
-                            <span>Social Media</span>
-                            <span>Campaigns</span>
-                            <span>Graphics</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- 15. Motion & Video -->
-                <article class="work-v2__card" data-category="motion">
-                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: linear-gradient(135deg, #450a0a 0%, #dc2626 50%, #f87171 100%);">
-                        <span class="work-v2__placeholder-text">Motion &amp; Video</span>
-                    </div>
-                    <div class="work-v2__card-body">
-                        <span class="work-v2__card-category">Motion &amp; Video</span>
-                        <h3 class="work-v2__card-title">Motion &amp; Video</h3>
-                        <p class="work-v2__card-desc">Promotional videos, pharmaceutical product presentations and motion graphics created for digital campaigns and corporate communication.</p>
-                        <div class="work-v2__card-tags">
-                            <span>After Effects</span>
-                            <span>Premiere Pro</span>
-                            <span>Motion Design</span>
-                        </div>
-                        <a href="#" class="work-v2__card-link">
-                            View Project
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </a>
-                    </div>
-                </article>
-
+                <?php else: ?>
+                    <?php foreach ($featuredProjects as $i => $proj):
+                        $isFeaturedCard = ($i === 0 && !empty($proj['is_featured']));
+                        $catSlug = htmlspecialchars($proj['primary_category_slug'] ?? '');
+                        $catName = htmlspecialchars($proj['primary_category_name'] ?? '');
+                        $title = htmlspecialchars($proj['title'] ?? '');
+                        $desc = htmlspecialchars($proj['summary'] ?? $proj['description'] ?? '');
+                        $slug = htmlspecialchars($proj['slug'] ?? '');
+                        $heroImage = $proj['hero_image'] ?? '';
+                        $tags = array_filter(array_map('trim', explode(',', $proj['tags'] ?? '')));
+                        // Build gradient placeholder colors based on category
+                        $gradients = [
+                            'web-uiux'  => 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #2563eb 100%)',
+                            'pharma'    => 'linear-gradient(135deg, #581c87 0%, #9333ea 50%, #c084fc 100%)',
+                            'branding'  => 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+                            'graphics'  => 'linear-gradient(135deg, #78350f 0%, #d97706 50%, #fbbf24 100%)',
+                            'motion'    => 'linear-gradient(135deg, #450a0a 0%, #dc2626 50%, #f87171 100%)',
+                        ];
+                        $gradient = $gradients[$catSlug] ?? 'linear-gradient(135deg, #0f172a 0%, #334155 50%, #1e293b 100%)';
+                    ?>
+                        <article class="work-v2__card<?= $isFeaturedCard ? ' work-v2__card--featured' : '' ?>" data-category="<?= $catSlug ?>">
+                            <?php if (!empty($heroImage)): ?>
+                                <div class="work-v2__card-image">
+                                    <img src="<?= htmlspecialchars($heroImage) ?>" alt="<?= $title ?> Ã¢â‚¬â€ Project by Nitin Kumar" loading="lazy">
+                                </div>
+                            <?php else: ?>
+                                <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: <?= $gradient ?>;">
+                                    <span class="work-v2__placeholder-text"><?= $title ?></span>
+                                </div>
+                            <?php endif; ?>
+                            <div class="work-v2__card-body">
+                                <span class="work-v2__card-category"><?= $catName ?></span>
+                                <h3 class="work-v2__card-title"><?= $title ?></h3>
+                                <p class="work-v2__card-desc"><?= $desc ?></p>
+                                <?php if (!empty($tags)): ?>
+                                    <div class="work-v2__card-tags">
+                                        <?php foreach (array_slice($tags, 0, 3) as $tag): ?>
+                                            <span><?= htmlspecialchars($tag) ?></span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                                <a href="/project/<?= $slug ?>" class="work-v2__card-link">
+                                    View Project
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                </a>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
 
             <div class="work-v2__cta">
-                <a href="projects.html" class="btn btn-secondary">
+                <a href="/projects" class="btn btn-secondary">
                     View All Projects
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
             </div>
         </div>
     </section>
+
 
     <!-- Skills Section -->
     <section class="skills" id="skills">
@@ -1336,7 +1094,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <a href="index.html" class="logo">
+                    <a href="/" class="logo">
                         <img src="img/Logo knitin.png" alt="Knitin - Create A Better Tomorrow" class="logo-img">
                     </a>
                     <p>Professional graphic design and web development services in Chandigarh. Creating digital
@@ -1350,7 +1108,7 @@
                             <li><a href="#about">About</a></li>
                             <li><a href="#services">Services</a></li>
                             <li><a href="#portfolio">Work</a></li>
-                            <li><a href="projects.html">All Projects</a></li>
+                            <li><a href="/projects">All Projects</a></li>
                             <li><a href="faq.html">FAQ</a></li>
                         </ul>
                     </div>

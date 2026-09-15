@@ -80,6 +80,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'is_featured' => !empty($_POST['is_featured']) ? 1 : 0,
                 'status' => $_POST['status'] ?? 'published',
                 'sort_order' => (int)($_POST['sort_order'] ?? 0),
+                'subtitle' => trim($_POST['subtitle'] ?? ''),
+                'country' => trim($_POST['country'] ?? ''),
+                'project_year' => !empty($_POST['project_year']) ? (int)$_POST['project_year'] : null,
+                'services' => trim($_POST['services'] ?? ''),
+                'technologies' => trim($_POST['technologies'] ?? ''),
+                'tools' => trim($_POST['tools'] ?? ''),
+                'github_url' => trim($_POST['github_url'] ?? ''),
+                'behance_url' => trim($_POST['behance_url'] ?? ''),
+                'demo_url' => trim($_POST['demo_url'] ?? ''),
+                'case_study_url' => trim($_POST['case_study_url'] ?? ''),
+                'seo_title' => trim($_POST['seo_title'] ?? ''),
+                'seo_description' => trim($_POST['seo_description'] ?? ''),
+                'image_alt' => trim($_POST['image_alt'] ?? ''),
             ];
 
             try {
@@ -116,10 +129,10 @@ $currentAdditionals = $project['additional_category_ids'] ?? [];
             <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--admin-text);"><?= $isEdit ? 'Edit Project' : 'Add New Project' ?></h2>
         </div>
 
-        <?php if ($isEdit): ?>
-            <a href="../projects.html" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+        <?php if ($isEdit && !empty($project['slug'])): ?>
+            <a href="/project/<?= htmlspecialchars($project['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                View Frontend Showcase
+                View Frontend Page
             </a>
         <?php endif; ?>
     </div>
@@ -158,10 +171,10 @@ $currentAdditionals = $project['additional_category_ids'] ?? [];
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                         <div>
-                            <label for="projectSlug" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
-                                URL Slug (auto-generated if empty)
+                            <label for="projectSubtitle" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                Project Subtitle / Formulation
                             </label>
-                            <input type="text" id="projectSlug" name="slug" value="<?= htmlspecialchars($project['slug'] ?? '') ?>" placeholder="e.g. dermovent-fp" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                            <input type="text" id="projectSubtitle" name="subtitle" value="<?= htmlspecialchars($project['subtitle'] ?? '') ?>" placeholder="e.g. Griseofulvin 250mg & Cetirizine HCl 5mg" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
                         </div>
                         <div>
                             <label for="projectClient" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
@@ -173,16 +186,31 @@ $currentAdditionals = $project['additional_category_ids'] ?? [];
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                         <div>
-                            <label for="projectIndustry" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
-                                Subtitle / Industry / Formulation
+                            <label for="projectSlug" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                URL Slug (auto-generated if empty)
                             </label>
-                            <input type="text" id="projectIndustry" name="industry" value="<?= htmlspecialchars($project['industry'] ?? '') ?>" placeholder="e.g. Griseofulvin 250mg & Cetirizine HCl 5mg" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                            <input type="text" id="projectSlug" name="slug" value="<?= htmlspecialchars($project['slug'] ?? '') ?>" placeholder="e.g. dermovent-fp" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
                         </div>
                         <div>
                             <label for="projectType" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
                                 Project Type / Discipline Focus
                             </label>
                             <input type="text" id="projectType" name="project_type" value="<?= htmlspecialchars($project['project_type'] ?? '') ?>" placeholder="e.g. Medical Visual Aid, Web Application..." class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label for="projectIndustry" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                Industry / Sector
+                            </label>
+                            <input type="text" id="projectIndustry" name="industry" value="<?= htmlspecialchars($project['industry'] ?? '') ?>" placeholder="e.g. Pharmaceuticals, Healthcare, SaaS" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        </div>
+                        <div>
+                            <label for="projectCountry" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                Country / Location
+                            </label>
+                            <input type="text" id="projectCountry" name="country" value="<?= htmlspecialchars($project['country'] ?? '') ?>" placeholder="e.g. India, USA, Global" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
                         </div>
                     </div>
 
@@ -274,24 +302,112 @@ $currentAdditionals = $project['additional_category_ids'] ?? [];
                     </div>
                 </div>
 
-                <!-- Card: Tags & Meta -->
+                <!-- Card: Project Specifications & Skills -->
                 <div class="card" style="background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: var(--radius-md); padding: 24px;">
                     <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--admin-text); margin-bottom: 20px; border-bottom: 1px solid var(--admin-border); padding-bottom: 12px;">
-                        Tags &amp; Relevant Skills
+                        Specifications &amp; Technologies
                     </h3>
 
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label for="projectYear" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                Project Year
+                            </label>
+                            <input type="number" id="projectYear" name="project_year" value="<?= htmlspecialchars((string)($project['project_year'] ?? date('Y'))) ?>" min="2010" max="2035" placeholder="e.g. 2024" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        </div>
+                        <div>
+                            <label for="projectTags" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                Card Tags (comma-separated)
+                            </label>
+                            <input type="text" id="projectTags" name="tags" value="<?= htmlspecialchars($project['tags'] ?? '') ?>" placeholder="e.g. Visual Aid, Graphic Design, Medical" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        </div>
+                    </div>
+
                     <div style="margin-bottom: 16px;">
-                        <label for="projectTags" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
-                            Tags (comma-separated, max 2–3 will display on frontend card)
+                        <label for="projectServices" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                            Services Delivered (comma-separated)
                         </label>
-                        <input type="text" id="projectTags" name="tags" value="<?= htmlspecialchars($project['tags'] ?? '') ?>" placeholder="e.g. Visual Aid, Graphic Design, Medical" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        <input type="text" id="projectServices" name="services" value="<?= htmlspecialchars($project['services'] ?? '') ?>" placeholder="e.g. Visual Aid Design, Medical Illustration, Brand Identity" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <label for="projectTechnologies" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                Technologies Used (comma-separated)
+                            </label>
+                            <input type="text" id="projectTechnologies" name="technologies" value="<?= htmlspecialchars($project['technologies'] ?? '') ?>" placeholder="e.g. HTML5, CSS3, JavaScript, PHP" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        </div>
+                        <div>
+                            <label for="projectTools" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                Design &amp; Dev Tools (comma-separated)
+                            </label>
+                            <input type="text" id="projectTools" name="tools" value="<?= htmlspecialchars($project['tools'] ?? '') ?>" placeholder="e.g. Adobe Illustrator, Photoshop, Figma" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: External Links & Deliverables -->
+                <div class="card" style="background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: var(--radius-md); padding: 24px;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--admin-text); margin-bottom: 20px; border-bottom: 1px solid var(--admin-border); padding-bottom: 12px;">
+                        External Links &amp; Deliverables
+                    </h3>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label for="projectUrl" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                Live Project URL
+                            </label>
+                            <input type="url" id="projectUrl" name="project_url" value="<?= htmlspecialchars($project['project_url'] ?? '') ?>" placeholder="https://..." class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        </div>
+                        <div>
+                            <label for="demoUrl" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                Interactive Prototype / Demo URL
+                            </label>
+                            <input type="url" id="demoUrl" name="demo_url" value="<?= htmlspecialchars($project['demo_url'] ?? '') ?>" placeholder="https://figma.com/proto/... or https://..." class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label for="githubUrl" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                GitHub Repository URL
+                            </label>
+                            <input type="url" id="githubUrl" name="github_url" value="<?= htmlspecialchars($project['github_url'] ?? '') ?>" placeholder="https://github.com/..." class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        </div>
+                        <div>
+                            <label for="behanceUrl" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                                Behance Portfolio Showcase URL
+                            </label>
+                            <input type="url" id="behanceUrl" name="behance_url" value="<?= htmlspecialchars($project['behance_url'] ?? '') ?>" placeholder="https://behance.net/gallery/..." class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        </div>
                     </div>
 
                     <div>
-                        <label for="projectUrl" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
-                            Live Project / Case Study External Link
+                        <label for="caseStudyUrl" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                            Full Case Study / Documentation Link or PDF Path
                         </label>
-                        <input type="url" id="projectUrl" name="project_url" value="<?= htmlspecialchars($project['project_url'] ?? '') ?>" placeholder="https://..." class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                        <input type="text" id="caseStudyUrl" name="case_study_url" value="<?= htmlspecialchars($project['case_study_url'] ?? '') ?>" placeholder="pdf/case-study.pdf or https://..." class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                    </div>
+                </div>
+
+                <!-- Card: SEO & Social Optimization -->
+                <div class="card" style="background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: var(--radius-md); padding: 24px;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--admin-text); margin-bottom: 20px; border-bottom: 1px solid var(--admin-border); padding-bottom: 12px;">
+                        SEO &amp; Social Optimization
+                    </h3>
+
+                    <div style="margin-bottom: 16px;">
+                        <label for="seoTitle" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                            Custom Meta Title (falls back to Project Title)
+                        </label>
+                        <input type="text" id="seoTitle" name="seo_title" value="<?= htmlspecialchars($project['seo_title'] ?? '') ?>" placeholder="Leave blank to use default project title" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem;">
+                    </div>
+
+                    <div>
+                        <label for="seoDescription" style="display: block; font-size: 0.88rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                            Custom Meta Description (falls back to Card Excerpt)
+                        </label>
+                        <textarea id="seoDescription" name="seo_description" rows="2" placeholder="Search engine description snippet (150-160 characters recommended)..." class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid var(--admin-border); border-radius: 8px; font-size: 0.9rem; resize: vertical;"><?= htmlspecialchars($project['seo_description'] ?? '') ?></textarea>
                     </div>
                 </div>
 
@@ -357,7 +473,10 @@ $currentAdditionals = $project['additional_category_ids'] ?? [];
                         <input type="file" name="hero_image_file" accept="image/*" class="form-control" style="width: 100%; font-size: 0.85rem; margin-bottom: 10px;">
 
                         <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-text); margin-bottom: 4px;">Or Image URL / Path</label>
-                        <input type="text" name="hero_image" value="<?= htmlspecialchars($project['hero_image'] ?? '') ?>" placeholder="img/work/..." class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--admin-border); border-radius: 6px; font-size: 0.85rem;">
+                        <input type="text" name="hero_image" value="<?= htmlspecialchars($project['hero_image'] ?? '') ?>" placeholder="img/work/..." class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--admin-border); border-radius: 6px; font-size: 0.85rem; margin-bottom: 12px;">
+
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-text); margin-bottom: 4px;">Image Alt Text</label>
+                        <input type="text" name="image_alt" value="<?= htmlspecialchars($project['image_alt'] ?? '') ?>" placeholder="Accessible description of project image..." class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--admin-border); border-radius: 6px; font-size: 0.85rem;">
                     </div>
                 </div>
 

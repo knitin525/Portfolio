@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initContactForm();
     initScrollAnimations();
     initSmoothScroll();
+    initParallaxBanner();
 });
 
 // ================== NAVIGATION ==================
@@ -511,3 +512,64 @@ function initThemeSystem() {
     const currentTheme = document.documentElement.getAttribute('data-theme') || getPreferredTheme();
     applyTheme(currentTheme, false);
 }
+
+// ================== PARALLAX SHOWCASE BANNER ==================
+function initParallaxBanner() {
+    const banner = document.getElementById('showcaseBanner');
+    const parallaxMedia = document.getElementById('parallaxMedia');
+    if (!banner || !parallaxMedia) return;
+
+    // Respect reduced motion preferences
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+    }
+
+    let isVisible = false;
+    let ticking = false;
+
+    // Use IntersectionObserver so calculations only run when section is in/near viewport
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            isVisible = entry.isIntersecting;
+            if (isVisible) {
+                requestUpdate();
+            }
+        });
+    }, {
+        rootMargin: '120px 0px 120px 0px'
+    });
+
+    observer.observe(banner);
+
+    function updateParallax() {
+        ticking = false;
+        if (!isVisible) return;
+
+        const rect = banner.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+
+        // Progress from 0 (entering bottom of screen) to 1 (leaving top of screen)
+        const totalDistance = windowHeight + rect.height;
+        const currentDistance = windowHeight - rect.top;
+        const progress = Math.max(0, Math.min(1, currentDistance / totalDistance));
+
+        // Dynamic travel based on banner height, safely bounded within the 20% bleed
+        const maxOffset = Math.min(rect.height * 0.16, 130);
+        const offsetY = (progress - 0.5) * maxOffset * 2;
+
+        parallaxMedia.style.transform = `translate3d(0, ${offsetY.toFixed(1)}px, 0)`;
+    }
+
+    function requestUpdate() {
+        if (!ticking) {
+            requestAnimationFrame(updateParallax);
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate, { passive: true });
+
+    // Initial positioning
+    requestUpdate();
+}

@@ -46,15 +46,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Primary Category is required. Please select exactly one Primary Category.';
         } else {
             // Handle image upload if provided
-            $heroImage = trim($_POST['hero_image'] ?? ($project['hero_image'] ?? ''));
-            if (!empty($_FILES['hero_image_file']['name']) && $_FILES['hero_image_file']['error'] === UPLOAD_ERR_OK) {
+            $removeHero = !empty($_POST['remove_hero_image']);
+            $heroImage = $removeHero ? null : trim($_POST['hero_image'] ?? ($project['hero_image'] ?? ''));
+            if (!$removeHero && !empty($_FILES['hero_image_file']['name']) && $_FILES['hero_image_file']['error'] === UPLOAD_ERR_OK) {
                 $uploadDir = dirname(__DIR__) . '/uploads/projects';
                 if (!is_dir($uploadDir)) {
                     @mkdir($uploadDir, 0755, true);
                 }
 
                 $ext = strtolower(pathinfo($_FILES['hero_image_file']['name'], PATHINFO_EXTENSION));
-                $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'];
+                $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'];
                 if (in_array($ext, $allowed, true)) {
                     $fileName = 'proj_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
                     $targetPath = $uploadDir . '/' . $fileName;
@@ -97,6 +98,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             try {
                 $savedId = $projectService->saveProject($projectData, $isEdit ? $id : null);
+                // Handle multiple gallery files upload
+                if (!empty($_FILES['gallery_files']['name'][0])) {
+                    $uploadDir = dirname(__DIR__) . '/uploads/projects';
+                    if (!is_dir($uploadDir)) {
+                        @mkdir($uploadDir, 0755, true);
+                    }
+                    $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'];
+                    foreach ($_FILES['gallery_files']['name'] as $idx => $origName) {
+                        if (!empty($origName) && $_FILES['gallery_files']['error'][$idx] === UPLOAD_ERR_OK) {
+                            $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+                            if (in_array($ext, $allowed, true)) {
+                                $fileName = 'gal_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+                                $targetPath = $uploadDir . '/' . $fileName;
+                                if (move_uploaded_file($_FILES['gallery_files']['tmp_name'][$idx], $targetPath)) {
+                                    $projectService->saveProjectImage($savedId, [
+                                        'image_path' => 'uploads/projects/' . $fileName,
+                                        'image_alt' => $title . ' — Detail ' . ($idx + 1),
+                                        'image_type' => 'gallery',
+                                        'sort_order' => $idx,
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Handle delete gallery image request
+                if (!empty($_POST['delete_gallery_image_id'])) {
+                    $delImgId = (int)$_POST['delete_gallery_image_id'];
+                    if ($delImgId > 0) {
+                        $projectService->deleteProjectImage($delImgId);
+                    }
+                }
+
                 if (!$isEdit) {
                     redirect("project-edit.php?id={$savedId}&created=1");
                 } else {
@@ -117,6 +152,7 @@ if (isset($_GET['created'])) {
 // Prepare current values
 $currentPrimary = (int)($project['primary_category_id'] ?? 0);
 $currentAdditionals = $project['additional_category_ids'] ?? [];
+$galleryImages = $isEdit ? $projectService->getProjectImages($id) : [];
 ?>
 
 <div style="max-width: 1040px; margin: 0 auto;">
@@ -451,32 +487,91 @@ $currentAdditionals = $project['additional_category_ids'] ?? [];
                     </button>
                 </div>
 
-                <!-- Hero Image Card -->
+                <!-- Project Icon & Hero Image Card -->
                 <div class="card" style="background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: var(--radius-md); padding: 20px;">
-                    <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--admin-text); margin-bottom: 16px; border-bottom: 1px solid var(--admin-border); padding-bottom: 10px;">
-                        Project Hero Image
+                    <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--admin-text); margin-bottom: 6px; border-bottom: 1px solid var(--admin-border); padding-bottom: 10px;">
+                        Project Icon &amp; Hero Image
                     </h4>
+                    <p style="font-size: 0.8rem; color: var(--admin-text-muted); margin-bottom: 14px;">
+                        Used as the project icon/thumbnail in tables and cards, and as the hero banner on the project page.
+                    </p>
 
                     <div style="margin-bottom: 14px;">
-                        <div id="imagePreviewContainer" style="width: 100%; aspect-ratio: 16/10; border-radius: 8px; border: 1px solid var(--admin-border); overflow: hidden; background: #0f172a; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                            <?php if (!empty($project['hero_image'])): ?>
-                                <img id="imagePreview" src="../<?= htmlspecialchars($project['hero_image']) ?>" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
-                            <?php else: ?>
-                                <div id="imagePlaceholder" style="text-align: center; color: #94a3b8; font-size: 0.85rem; padding: 16px;">
+                        <?php 
+                        $previewUrl = !empty($project['hero_image']) ? project_image_url($project['hero_image'], true) : '';
+                        ?>
+                        <div id="imagePreviewContainer" style="position: relative; width: 100%; aspect-ratio: 16/10; border-radius: 8px; border: 2px dashed var(--admin-border); overflow: hidden; background: #0f172a; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; cursor: pointer; transition: border-color 0.2s ease;" onclick="document.getElementById('heroImageFileInput').click()" title="Click to upload new image">
+                            <?php if (!empty($previewUrl)): ?>
+                                <img id="imagePreview" src="<?= htmlspecialchars($previewUrl) ?>" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; document.getElementById('imagePlaceholder').style.display='flex';">
+                                <div id="imagePlaceholder" style="display: none; text-align: center; color: #94a3b8; font-size: 0.85rem; padding: 16px; flex-direction: column; align-items: center; justify-content: center;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 6px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                     <div>No image uploaded</div>
                                 </div>
+                            <?php else: ?>
+                                <img id="imagePreview" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                <div id="imagePlaceholder" style="text-align: center; color: #94a3b8; font-size: 0.85rem; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 6px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                    <div>Click or drag &amp; drop to upload image</div>
+                                </div>
                             <?php endif; ?>
+                            <div id="dropzoneOverlay" style="position: absolute; inset: 0; background: rgba(37, 99, 235, 0.2); display: none; align-items: center; justify-content: center; font-weight: 600; color: #fff; font-size: 0.9rem;">
+                                Drop image here
+                            </div>
                         </div>
 
                         <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-text); margin-bottom: 4px;">Upload Image File</label>
-                        <input type="file" name="hero_image_file" accept="image/*" class="form-control" style="width: 100%; font-size: 0.85rem; margin-bottom: 10px;">
+                        <input type="file" id="heroImageFileInput" name="hero_image_file" accept="image/*" class="form-control" style="width: 100%; font-size: 0.85rem; margin-bottom: 10px;">
 
-                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-text); margin-bottom: 4px;">Or Image URL / Path</label>
-                        <input type="text" name="hero_image" value="<?= htmlspecialchars($project['hero_image'] ?? '') ?>" placeholder="img/work/..." class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--admin-border); border-radius: 6px; font-size: 0.85rem; margin-bottom: 12px;">
+                        <?php if (!empty($project['hero_image'])): ?>
+                            <div style="margin-bottom: 12px; padding: 8px 10px; background: rgba(239, 68, 68, 0.08); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--admin-danger); cursor: pointer;">
+                                    <input type="checkbox" name="remove_hero_image" value="1" id="removeHeroCheckbox" onchange="toggleRemoveHero(this.checked)">
+                                    <span>Remove current image on save</span>
+                                </label>
+                            </div>
+                        <?php endif; ?>
+
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-text); margin-bottom: 4px;">Or Image URL / Relative Path</label>
+                        <input type="text" id="heroImageTextInput" name="hero_image" value="<?= htmlspecialchars($project['hero_image'] ?? '') ?>" placeholder="uploads/projects/... or img/..." class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--admin-border); border-radius: 6px; font-size: 0.85rem; margin-bottom: 12px;">
 
                         <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-text); margin-bottom: 4px;">Image Alt Text</label>
                         <input type="text" name="image_alt" value="<?= htmlspecialchars($project['image_alt'] ?? '') ?>" placeholder="Accessible description of project image..." class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--admin-border); border-radius: 6px; font-size: 0.85rem;">
+                    </div>
+                </div>
+
+                <!-- Project Gallery Images Card -->
+                <div class="card" style="background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: var(--radius-md); padding: 20px;">
+                    <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--admin-text); margin-bottom: 6px; border-bottom: 1px solid var(--admin-border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>Project Gallery Images</span>
+                        <span style="font-size: 0.75rem; background: rgba(37, 99, 235, 0.1); color: var(--primary); padding: 2px 8px; border-radius: 50px;">
+                            <?= count($galleryImages) ?> images
+                        </span>
+                    </h4>
+                    <p style="font-size: 0.8rem; color: var(--admin-text-muted); margin-bottom: 14px;">
+                        Add multiple high-resolution showcase images for the case study gallery and lightbox.
+                    </p>
+
+                    <?php if (!empty($galleryImages)): ?>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+                            <?php foreach ($galleryImages as $gImg): 
+                                $gUrl = project_image_url($gImg['image_path'], true);
+                            ?>
+                                <div style="position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--admin-border); aspect-ratio: 4/3; background: #0f172a;">
+                                    <img src="<?= htmlspecialchars($gUrl) ?>" alt="<?= htmlspecialchars($gImg['image_alt'] ?? '') ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <button type="submit" name="delete_gallery_image_id" value="<?= (int)$gImg['id'] ?>" onclick="return confirm('Delete this gallery image?');" title="Delete image" style="position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; background: rgba(239, 68, 68, 0.9); border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-text); margin-bottom: 6px;">
+                        Upload Gallery Photos (Select Multiple)
+                    </label>
+                    <input type="file" name="gallery_files[]" multiple accept="image/*" class="form-control" style="width: 100%; font-size: 0.85rem;">
+                    <div style="font-size: 0.75rem; color: var(--admin-text-muted); margin-top: 6px;">
+                        Supported formats: JPG, PNG, WebP, GIF, SVG, AVIF.
                     </div>
                 </div>
 
@@ -601,7 +696,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial state sync
     syncCategoryState();
+
+    // =========================================================================
+    // Image Preview & Drag-and-Drop Handlers
+    // =========================================================================
+    const fileInput = document.getElementById('heroImageFileInput');
+    const textInput = document.getElementById('heroImageTextInput');
+    const previewImg = document.getElementById('imagePreview');
+    const placeholder = document.getElementById('imagePlaceholder');
+    const dropzone = document.getElementById('imagePreviewContainer');
+    const dropOverlay = document.getElementById('dropzoneOverlay');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    if (placeholder) placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+
+    if (dropzone) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (dropOverlay) dropOverlay.style.display = 'flex';
+                dropzone.style.borderColor = 'var(--admin-primary)';
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (dropOverlay) dropOverlay.style.display = 'none';
+                dropzone.style.borderColor = 'var(--admin-border)';
+            });
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            if (dt && dt.files && dt.files[0]) {
+                fileInput.files = dt.files;
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    previewImg.src = evt.target.result;
+                    previewImg.style.display = 'block';
+                    if (placeholder) placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(dt.files[0]);
+            }
+        });
+    }
+
+    if (textInput) {
+        textInput.addEventListener('input', function() {
+            const val = this.value.trim();
+            if (val && !fileInput.files.length) {
+                // If text input is typed and no file is selected, update preview
+                const resolvedUrl = (val.startsWith('http') || val.startsWith('//') || val.startsWith('data:')) ? val : '../' + val.replace(/^\/+/, '');
+                previewImg.src = resolvedUrl;
+                previewImg.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+            }
+        });
+    }
 });
+
+function toggleRemoveHero(isChecked) {
+    const previewImg = document.getElementById('imagePreview');
+    const placeholder = document.getElementById('imagePlaceholder');
+    if (isChecked) {
+        if (previewImg) previewImg.style.opacity = '0.3';
+    } else {
+        if (previewImg) previewImg.style.opacity = '1';
+    }
+}
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

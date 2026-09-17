@@ -555,6 +555,14 @@ class ProjectService {
         return $stmt->execute([$id]);
     }
 
+    /**
+     * Update project hero / icon image path.
+     */
+    public function updateProjectImage(int $id, ?string $imagePath): bool {
+        $stmt = $this->pdo->prepare("UPDATE projects SET hero_image = ?, updated_at = NOW() WHERE id = ?");
+        return $stmt->execute([$imagePath, $id]);
+    }
+
     // =========================================================================
     // RELATED PROJECTS RECOMMENDATION ALGORITHM
     // Priority:
@@ -756,5 +764,69 @@ class ProjectService {
         $text = preg_replace('~-+~', '-', $text);
         $text = strtolower($text);
         return !empty($text) ? $text : 'item-' . bin2hex(random_bytes(3));
+    }
+
+    // =========================================================================
+    // PROJECT GALLERY IMAGES
+    // =========================================================================
+
+    /**
+     * Get all images for a project, ordered by sort_order.
+     */
+    public function getProjectImages(int $projectId): array {
+        try {
+            $stmt = $this->pdo->prepare(
+                "SELECT * FROM project_images WHERE project_id = ? ORDER BY sort_order ASC, id ASC"
+            );
+            $stmt->execute([$projectId]);
+            return $stmt->fetchAll();
+        } catch (\PDOException $e) {
+            // Table may not exist yet
+            return [];
+        }
+    }
+
+    /**
+     * Save a new gallery image for a project.
+     *
+     * @return int The inserted image ID
+     */
+    public function saveProjectImage(int $projectId, array $data): int {
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO project_images (project_id, image_path, image_alt, image_type, sort_order)
+             VALUES (?, ?, ?, ?, ?)"
+        );
+        $stmt->execute([
+            $projectId,
+            $data['image_path'] ?? '',
+            $data['image_alt'] ?? null,
+            $data['image_type'] ?? 'gallery',
+            $data['sort_order'] ?? 0,
+        ]);
+        return (int)$this->pdo->lastInsertId();
+    }
+
+    /**
+     * Delete a gallery image by ID.
+     */
+    public function deleteProjectImage(int $imageId): bool {
+        $stmt = $this->pdo->prepare("DELETE FROM project_images WHERE id = ?");
+        return $stmt->execute([$imageId]);
+    }
+
+    /**
+     * Reorder gallery images for a project.
+     *
+     * @param int $projectId
+     * @param array $imageIds Ordered array of image IDs
+     */
+    public function reorderProjectImages(int $projectId, array $imageIds): bool {
+        $stmt = $this->pdo->prepare(
+            "UPDATE project_images SET sort_order = ? WHERE id = ? AND project_id = ?"
+        );
+        foreach ($imageIds as $order => $imageId) {
+            $stmt->execute([$order, (int)$imageId, $projectId]);
+        }
+        return true;
     }
 }

@@ -162,9 +162,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Update Directory Counter Badge
+        // Update Directory Counter Badge & Subtitle
         if (directoryCount) {
-            directoryCount.textContent = `${directoryVisible} Projects`;
+            directoryCount.textContent = `${totalVisible} Project${totalVisible !== 1 ? 's' : ''}`;
+        }
+
+        const directorySubtitle = document.getElementById('directorySubtitle');
+        if (directorySubtitle) {
+            if (activeFilter === 'all' && !query) {
+                directorySubtitle.textContent = 'Explore 27 client deliverables, brand systems, and creative executions';
+            } else if (query) {
+                directorySubtitle.textContent = `Showing ${totalVisible} matching result${totalVisible !== 1 ? 's' : ''} for "${query}"`;
+            } else {
+                const label = categoryMeta[activeFilter]?.label || activeFilter;
+                directorySubtitle.textContent = `Showing ${totalVisible} client project${totalVisible !== 1 ? 's' : ''} in ${label}`;
+            }
         }
 
         // Show/Hide No Results State

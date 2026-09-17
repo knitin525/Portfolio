@@ -170,6 +170,7 @@ CREATE TABLE IF NOT EXISTS `contact_submissions` (
     INDEX `idx_subm_email` (`email_id`),
     INDEX `idx_subm_status` (`status`),
     INDEX `idx_subm_created` (`created_at`),
+    INDEX `idx_subm_ip` (`ip_address`),
     CONSTRAINT `fk_subm_contact` FOREIGN KEY (`contact_id`) REFERENCES `contacts` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_subm_conversation` FOREIGN KEY (`conversation_id`) REFERENCES `conversations` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_subm_email` FOREIGN KEY (`email_id`) REFERENCES `emails` (`id`) ON DELETE SET NULL
@@ -206,8 +207,7 @@ INSERT INTO `settings` (`setting_key`, `setting_value`, `setting_group`) VALUES
 ('notification_subject', 'New Contact Form Submission: {name} - {subject}', 'notifications'),
 ('email_sync_interval', '5', 'email_sync'),
 ('last_sync_time', NULL, 'email_sync')
-ON DUPLICATE KEY UPDATE 
-    `setting_value` = VALUES(`setting_value`),
+ON DUPLICATE KEY UPDATE
     `setting_group` = VALUES(`setting_group`);
 
 -- ----------------------------------------------------------------
@@ -233,20 +233,34 @@ CREATE TABLE IF NOT EXISTS `projects` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `primary_category_id` BIGINT UNSIGNED NOT NULL,
     `title` VARCHAR(255) NOT NULL,
+    `subtitle` VARCHAR(255) NULL,
     `slug` VARCHAR(191) NOT NULL,
     `client_name` VARCHAR(150) NULL,
     `industry` VARCHAR(150) NULL,
+    `country` VARCHAR(100) NULL,
+    `project_year` YEAR NULL,
     `summary` TEXT NULL,
     `description` LONGTEXT NULL,
     `hero_image` VARCHAR(255) NULL,
+    `image_alt` VARCHAR(500) NULL,
     `tags` TEXT NULL,
     `project_type` VARCHAR(100) NULL,
+    `services` TEXT NULL,
+    `technologies` TEXT NULL,
+    `tools` TEXT NULL,
     `project_url` VARCHAR(255) NULL,
+    `github_url` VARCHAR(500) NULL,
+    `behance_url` VARCHAR(500) NULL,
+    `demo_url` VARCHAR(500) NULL,
+    `case_study_url` VARCHAR(500) NULL,
     `is_featured` TINYINT(1) NOT NULL DEFAULT 0,
     `status` ENUM('draft', 'published', 'archived') NOT NULL DEFAULT 'published',
     `sort_order` INT NOT NULL DEFAULT 0,
+    `seo_title` VARCHAR(255) NULL,
+    `seo_description` TEXT NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted_at` DATETIME NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_project_slug` (`slug`),
     INDEX `idx_projects_primary_cat` (`primary_category_id`),
@@ -267,6 +281,20 @@ CREATE TABLE IF NOT EXISTS `project_category_map` (
     INDEX `idx_pcm_proj` (`project_id`),
     CONSTRAINT `fk_pcm_project` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_pcm_category` FOREIGN KEY (`category_id`) REFERENCES `project_categories` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `project_images` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `project_id` BIGINT UNSIGNED NOT NULL,
+    `image_path` VARCHAR(500) NOT NULL,
+    `image_alt` VARCHAR(500) DEFAULT NULL,
+    `image_type` ENUM('gallery', 'mobile', 'desktop', 'detail', 'before', 'after', 'mockup', 'branding', 'packaging') NOT NULL DEFAULT 'gallery',
+    `sort_order` INT UNSIGNED NOT NULL DEFAULT 0,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    INDEX `idx_project_images_project_id` (`project_id`),
+    INDEX `idx_project_images_sort` (`project_id`, `sort_order`),
+    CONSTRAINT `fk_project_images_project` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed Default Categories (Duplicate-safe)

@@ -111,3 +111,19 @@ if (!function_exists('redirect')) {
         exit;
     }
 }
+
+if (!function_exists('project_image_url')) {
+    /**
+     * Resolve project image / icon URL for frontend or admin context.
+     * Prevents broken relative paths and 404 errors.
+     */
+    function project_image_url(?string $path, bool $isAdminContext = false): string {
+        if (empty($path)) return '';
+        $path = trim($path);
+        if (preg_match('#^(https?:)?//#i', $path) || str_starts_with($path, 'data:')) {
+            return $path;
+        }
+        $clean = ltrim($path, '/\\');
+        return ($isAdminContext ? '../' : '/') . $clean;
+    }
+}

@@ -37,9 +37,13 @@ RewriteRule ^index\.html$ / [L,R=301]
 # ----------------------------------------------------------------
 
 # /projects → projects.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^projects$ projects.php [L,QSA]
 
 # /project/{slug} → project.php?slug={slug}
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^project/([a-zA-Z0-9_-]+)$ project.php?slug=$1 [L,QSA]
 
 # ----------------------------------------------------------------

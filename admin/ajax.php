@@ -125,6 +125,84 @@ switch ($action) {
         json_response(['success' => $result]);
         break;
 
+    case 'upload_project_icon':
+        require_once dirname(__DIR__) . '/includes/ProjectService.php';
+        $projectId = (int)($_POST['project_id'] ?? 0);
+        if (!$projectId) {
+            json_response(['success' => false, 'message' => 'Missing project ID.'], 400);
+        }
+
+        if (empty($_FILES['icon_file']['name']) || $_FILES['icon_file']['error'] !== UPLOAD_ERR_OK) {
+            $uploadErrors = [
+                UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize limit.',
+                UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE directive.',
+                UPLOAD_ERR_PARTIAL => 'File was only partially uploaded.',
+                UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+            ];
+            $errMsg = $uploadErrors[$_FILES['icon_file']['error'] ?? 0] ?? 'File upload error occurred.';
+            json_response(['success' => false, 'message' => $errMsg], 400);
+        }
+
+        $file = $_FILES['icon_file'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'];
+        if (!in_array($ext, $allowed, true)) {
+            json_response(['success' => false, 'message' => 'Invalid file format. Allowed: PNG, JPG, WEBP, SVG, GIF, AVIF.'], 400);
+        }
+
+        // 10MB limit
+        if ($file['size'] > 10 * 1024 * 1024) {
+            json_response(['success' => false, 'message' => 'File size exceeds 10MB limit.'], 400);
+        }
+
+        $uploadDir = dirname(__DIR__) . '/uploads/projects';
+        if (!is_dir($uploadDir)) {
+            @mkdir($uploadDir, 0755, true);
+        }
+
+        $fileName = 'proj_icon_' . $projectId . '_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
+        $targetPath = $uploadDir . '/' . $fileName;
+
+        if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+            json_response(['success' => false, 'message' => 'Could not save file to server uploads folder.'], 500);
+        }
+
+        $relPath = 'uploads/projects/' . $fileName;
+        $ps = new ProjectService($pdo);
+        $updated = $ps->updateProjectImage($projectId, $relPath);
+
+        if ($updated) {
+            json_response([
+                'success' => true,
+                'message' => 'Project icon uploaded successfully!',
+                'image_url' => $relPath,
+                'display_url' => project_image_url($relPath, true),
+            ]);
+        } else {
+            json_response(['success' => false, 'message' => 'Failed to save project icon to database.'], 500);
+        }
+        break;
+
+    case 'remove_project_icon':
+        require_once dirname(__DIR__) . '/includes/ProjectService.php';
+        $projectId = (int)($_POST['project_id'] ?? 0);
+        if (!$projectId) {
+            json_response(['success' => false, 'message' => 'Missing project ID.'], 400);
+        }
+
+        $ps = new ProjectService($pdo);
+        $updated = $ps->updateProjectImage($projectId, null);
+
+        if ($updated) {
+            json_response([
+                'success' => true,
+                'message' => 'Project icon removed successfully.',
+            ]);
+        } else {
+            json_response(['success' => false, 'message' => 'Could not remove icon in database.'], 500);
+        }
+        break;
+
     default:
         json_response(['success' => false, 'message' => 'Unknown action.'], 400);
         break;

@@ -193,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <div class="back-link">
-        <a href="../index.html">&larr; Return to knitin525.in</a>
+        <a href="../">&larr; Return to knitin525.in</a>
     </div>
 </div>
 </body>

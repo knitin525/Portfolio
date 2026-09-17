@@ -90,7 +90,7 @@ $publicCategories = $projectService->getPublishedCategories();
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap"
         rel="stylesheet">
 
     <!-- Stylesheets -->
@@ -168,7 +168,7 @@ $publicCategories = $projectService->getPublishedCategories();
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="container nav-container">
-            <a href="#" class="logo">
+            <a href="/" class="logo">
                 <img src="img/Logo knitin.png" alt="Knitin - Create A Better Tomorrow" class="logo-img">
             </a>
             <ul class="nav-links" id="navLinks">
@@ -180,6 +180,32 @@ $publicCategories = $projectService->getPublishedCategories();
                 <li><a href="#contact">Contact</a></li>
             </ul>
             <div class="nav-actions">
+                <div class="nav-social" aria-label="Social Profiles">
+                    <a href="https://www.facebook.com/knitin525" target="_blank" rel="noopener noreferrer" class="nav-social-link social-fb" aria-label="Facebook" title="Facebook">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.instagram.com/knit.in/" target="_blank" rel="noopener noreferrer" class="nav-social-link social-insta" aria-label="Instagram" title="Instagram">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.linkedin.com/in/knitin0706/" target="_blank" rel="noopener noreferrer" class="nav-social-link social-linkedin" aria-label="LinkedIn" title="LinkedIn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.youtube.com/@knitin525" target="_blank" rel="noopener noreferrer" class="nav-social-link social-yt" aria-label="YouTube" title="YouTube">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </a>
+                </div>
+                <span class="nav-divider" aria-hidden="true"></span>
+                <div class="nav-cta">
+                    <a href="#contact" class="nav-cta-link">Let's Talk <span class="cta-arrow">↗</span></a>
+                </div>
                 <button class="theme-toggle-btn" id="themeToggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode">
                     <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -196,9 +222,6 @@ $publicCategories = $projectService->getPublishedCategories();
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
                 </button>
-                <div class="nav-cta">
-                    <a href="#contact" class="btn btn-primary">Let's Talk</a>
-                </div>
                 <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
                     <span></span>
                     <span></span>
@@ -218,6 +241,31 @@ $publicCategories = $projectService->getPublishedCategories();
             <li><a href="#skills">Skills</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
+        <div class="mobile-social">
+            <span class="mobile-social-title">Connect with me</span>
+            <div class="mobile-social-icons">
+                <a href="https://www.facebook.com/knitin525" target="_blank" rel="noopener noreferrer" class="nav-social-link social-fb" aria-label="Facebook" title="Facebook">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                </a>
+                <a href="https://www.instagram.com/knit.in/" target="_blank" rel="noopener noreferrer" class="nav-social-link social-insta" aria-label="Instagram" title="Instagram">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </a>
+                <a href="https://www.linkedin.com/in/knitin0706/" target="_blank" rel="noopener noreferrer" class="nav-social-link social-linkedin" aria-label="LinkedIn" title="LinkedIn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                </a>
+                <a href="https://www.youtube.com/@knitin525" target="_blank" rel="noopener noreferrer" class="nav-social-link social-yt" aria-label="YouTube" title="YouTube">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Hero Section -->
@@ -225,11 +273,6 @@ $publicCategories = $projectService->getPublishedCategories();
         <div class="hero-bg">
             <div class="hero-gradient"></div>
             <div class="hero-pattern"></div>
-            <div class="floating-shapes">
-                <div class="shape shape-1"></div>
-                <div class="shape shape-2"></div>
-                <div class="shape shape-3"></div>
-            </div>
         </div>
         <div class="container hero-content">
             <div class="hero-text">
@@ -242,13 +285,14 @@ $publicCategories = $projectService->getPublishedCategories();
                     <span class="title-name">Nitin Kumar</span>
                 </h1>
                 <div class="hero-subtitle">
-                    <span class="subtitle-text">Creative Designer</span>
+                    <span class="subtitle-text">Senior Graphic Designer</span>
                     <span class="subtitle-divider">&</span>
-                    <span class="subtitle-text">Web Developer</span>
+                    <span class="subtitle-text">Developer</span>
                 </div>
                 <p class="hero-description">
-                    Crafting digital experiences that inspire, engage, and deliver results.
-                    With 12+ years of expertise in transforming ideas into stunning visual realities.
+                    Blending creative design with modern web development to build meaningful
+                    digital experiences. 12+ years transforming brands through logo design,
+                    UI/UX, packaging, and full-stack web solutions.
                 </p>
                 <div class="hero-ctas">
                     <a href="#portfolio" class="btn btn-primary btn-lg">
@@ -259,7 +303,7 @@ $publicCategories = $projectService->getPublishedCategories();
                             <polyline points="12 5 19 12 12 19"></polyline>
                         </svg>
                     </a>
-                    <a href="#contact" class="btn btn-outline btn-lg">Get In Touch</a>
+                    <a href="#contact" class="btn btn-outline btn-lg">Let's Talk</a>
                 </div>
                 <div class="hero-stats">
                     <div class="stat-item">
@@ -279,7 +323,7 @@ $publicCategories = $projectService->getPublishedCategories();
             <div class="hero-visual">
                 <div class="profile-frame">
                     <div class="profile-image">
-                        <img src="img\about img.webp" alt="Nitin Kumar">
+                        <img src="img/about img.webp" alt="Nitin Kumar — Senior Graphic Designer & Developer">
                     </div>
                     <div class="frame-accent"></div>
                 </div>
@@ -298,25 +342,10 @@ $publicCategories = $projectService->getPublishedCategories();
             <div class="about-v2__grid">
                 <!-- Left Column -->
                 <div class="about-v2__left">
-                    <div class="about-v2__header">
-                        <span class="about-v2__tag">
-                            <span class="about-v2__tag-dot"></span>
-                            About Me
-                        </span>
-                        <h2 class="about-v2__title">
-                            Where Design<br>
-                            Meets <span class="about-v2__title-accent">Development</span>
-                        </h2>
-                        <div class="about-v2__divider">
-                            <span class="about-v2__divider-line"></span>
-                            <span class="about-v2__divider-diamond"></span>
-                            <span class="about-v2__divider-line"></span>
-                        </div>
-                        <p class="about-v2__subtitle">Blending creative design with modern web development to build meaningful digital experiences.</p>
-                    </div>
+                    <p class="about-v2__subtitle">Blending creative design with modern web development to build meaningful digital experiences.</p>
 
                     <div class="about-v2__body">
-                        <p class="about-v2__lead">
+                        <p>
                             I'm a passionate <strong>graphic designer, web developer, and UI/UX designer</strong> based
                             in Chandigarh, specializing in creating stunning <strong>logo designs, brand identities, and
                             professional websites</strong> that make a lasting impact on your business.
@@ -335,71 +364,13 @@ $publicCategories = $projectService->getPublishedCategories();
                             create solutions that stand out in today's competitive landscape.
                         </p>
                     </div>
-
-                    <!-- Highlight Pills -->
-                    <div class="about-v2__pills">
-                        <div class="about-v2__pill">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            <span>12+ Years Experience</span>
-                        </div>
-                        <div class="about-v2__pill">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            <span>Graphic &amp; Web Design</span>
-                        </div>
-                        <div class="about-v2__pill">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            <span>UI/UX &amp; Front-End Development</span>
-                        </div>
-                        <div class="about-v2__pill">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            <span>Pharma Branding &amp; Digital Solutions</span>
-                        </div>
-                    </div>
-
-                    <div class="about-v2__cta">
-                        <a href="#" class="btn btn-primary" aria-label="Download CV">
-                            Download CV
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                        </a>
-                        <a href="/projects" class="link-arrow" aria-label="View all projects">
-                            View Portfolio
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
-                            </svg>
-                        </a>
-                    </div>
                 </div>
 
                 <!-- Right Column -->
                 <div class="about-v2__right">
                     <div class="about-v2__image-container">
                         <div class="about-v2__image-frame">
-                            <img src="img/about profile pik.webp" alt="Nitin Kumar - Graphic Designer & Web Developer in Chandigarh" loading="lazy">
+                            <img src="img/about profile pik.webp" alt="Nitin Kumar - Graphic Designer &amp; Web Developer in Chandigarh" loading="lazy">
                         </div>
                         <div class="about-v2__image-border"></div>
                         <div class="about-v2__image-glow"></div>
@@ -409,15 +380,219 @@ $publicCategories = $projectService->getPublishedCategories();
                     <div class="about-v2__stats">
                         <div class="about-v2__stat-card about-v2__stat-card--projects">
                             <span class="about-v2__stat-number">500+</span>
-                            <span class="about-v2__stat-label">Projects Delivered</span>
+                            <span class="about-v2__stat-label">Projects<br>Delivered</span>
                         </div>
                         <div class="about-v2__stat-card about-v2__stat-card--clients">
                             <span class="about-v2__stat-number">200+</span>
                             <span class="about-v2__stat-label">Happy Clients</span>
                         </div>
-                        <div class="about-v2__stat-card about-v2__stat-card--experience">
+                        <div class="about-v2__stat-card about-v2__stat-card--experience about-v2__stat-card--featured">
                             <span class="about-v2__stat-number">12+</span>
-                            <span class="about-v2__stat-label">Years of Excellence</span>
+                            <span class="about-v2__stat-label">Years of<br>Excellence</span>
+                        </div>
+                    </div>
+
+                    <!-- CTA Actions -->
+                    <div class="about-v2__cta">
+                        <a href="img/knitin C.V.pdf" download="Nitin_Kumar_CV.pdf" class="btn btn-primary btn-pill" aria-label="Download CV">
+                            <span>Download CV</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </a>
+                        <a href="/projects" class="about-v2__link-arrow" aria-label="View all projects">
+                            <span>View Portfolio</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Full-Width Row: Highlight Pills -->
+            <div class="about-v2__bottom">
+                <div class="about-v2__pills">
+                    <div class="about-v2__pill">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>12+ Years Experience</span>
+                    </div>
+                    <div class="about-v2__pill">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Graphic &amp; Web Design</span>
+                    </div>
+                    <div class="about-v2__pill">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>UI/UX &amp; Front-End Development</span>
+                    </div>
+                    <div class="about-v2__pill">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Pharma Branding &amp; Digital Solutions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section — Editorial List Layout -->
+    <section class="services-v2" id="services">
+        <div class="container">
+            <div class="services-v2__header">
+                <span class="section-tag">What I Do</span>
+                <h2 class="section-title">Services I Offer</h2>
+                <p class="section-desc">Comprehensive design & development solutions crafted for brands that want to stand out</p>
+            </div>
+            <div class="services-v2__list">
+                <a href="#contact" class="services-v2__row">
+                    <span class="services-v2__num">01</span>
+                    <h3 class="services-v2__name">Logo & Brand Identity</h3>
+                    <p class="services-v2__desc">Strategic brand marks, visual identity systems, and comprehensive brand guidelines that communicate authority and trust.</p>
+                    <span class="services-v2__arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                    </span>
+                </a>
+                <a href="#contact" class="services-v2__row">
+                    <span class="services-v2__num">02</span>
+                    <h3 class="services-v2__name">UI/UX Design</h3>
+                    <p class="services-v2__desc">Intuitive, user-centered interfaces that balance aesthetics with functionality for seamless digital experiences.</p>
+                    <span class="services-v2__arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                    </span>
+                </a>
+                <a href="#contact" class="services-v2__row">
+                    <span class="services-v2__num">03</span>
+                    <h3 class="services-v2__name">Web Development</h3>
+                    <p class="services-v2__desc">Responsive, high-performance websites built with modern technologies — WordPress, Shopify, HTML/CSS, PHP, and Laravel.</p>
+                    <span class="services-v2__arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                    </span>
+                </a>
+                <a href="#contact" class="services-v2__row">
+                    <span class="services-v2__num">04</span>
+                    <h3 class="services-v2__name">Graphic Design</h3>
+                    <p class="services-v2__desc">Compelling visual design — marketing collaterals, social media graphics, presentations, and digital banners that convert.</p>
+                    <span class="services-v2__arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                    </span>
+                </a>
+                <a href="#contact" class="services-v2__row">
+                    <span class="services-v2__num">05</span>
+                    <h3 class="services-v2__name">Packaging Design</h3>
+                    <p class="services-v2__desc">Pharmaceutical packaging, product cartons, labels, and visual aids crafted with compliance and shelf-impact precision.</p>
+                    <span class="services-v2__arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                    </span>
+                </a>
+                <a href="#contact" class="services-v2__row">
+                    <span class="services-v2__num">06</span>
+                    <h3 class="services-v2__name">Motion & Video Graphics</h3>
+                    <p class="services-v2__desc">Logo reveals, explainer videos, motion design sequences, and post-production editing that captivate audiences.</p>
+                    <span class="services-v2__arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Work Process Section -->
+    <section class="process-section" id="process">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">How I Work</span>
+                <h2 class="section-title">My Design Process</h2>
+                <p class="section-desc">A structured approach that ensures clarity, creativity, and consistent delivery</p>
+            </div>
+            <div class="process-grid">
+                <div class="process-step">
+                    <span class="process-step__number">01</span>
+                    <h3 class="process-step__title">Discovery</h3>
+                    <p class="process-step__desc">Understanding your brand, goals, audience, and competitors through research and in-depth conversation.</p>
+                </div>
+                <div class="process-step">
+                    <span class="process-step__number">02</span>
+                    <h3 class="process-step__title">Strategy</h3>
+                    <p class="process-step__desc">Defining the creative direction, sitemap, wireframes, and visual language that aligns with your objectives.</p>
+                </div>
+                <div class="process-step">
+                    <span class="process-step__number">03</span>
+                    <h3 class="process-step__title">Design</h3>
+                    <p class="process-step__desc">High-fidelity designs, mockups, and prototypes refined through iterative feedback until pixel-perfect.</p>
+                </div>
+                <div class="process-step">
+                    <span class="process-step__number">04</span>
+                    <h3 class="process-step__title">Deliver</h3>
+                    <p class="process-step__desc">Production-ready files, deployment, and handoff with documentation — ensuring a seamless launch.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Client Testimonials Section -->
+    <section class="testimonials-section" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Client Feedback</span>
+                <h2 class="section-title">What Clients Say</h2>
+                <p class="section-desc">Trusted by founders, marketers, and product teams across the US and Europe</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-card__quote">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.12"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    </div>
+                    <p class="testimonial-card__text">Tatiana is a powerhouse. She soaks up information and applies it with excellence. Fast, adaptable, and always delivering with a high level of quality.</p>
+                    <div class="testimonial-card__author">
+                        <div class="testimonial-card__author-info">
+                            <span class="testimonial-card__name">Francois van der Merwe</span>
+                            <span class="testimonial-card__role">Health & Wellness Company</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-card__quote">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.12"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    </div>
+                    <p class="testimonial-card__text">Outstanding design work with meticulous attention to detail. The brand identity exceeded our expectations and truly captures our company's essence.</p>
+                    <div class="testimonial-card__author">
+                        <div class="testimonial-card__author-info">
+                            <span class="testimonial-card__name">Repeat Client</span>
+                            <span class="testimonial-card__role">Pharma & Healthcare</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-card__quote">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.12"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    </div>
+                    <p class="testimonial-card__text">Professional, creative, and reliable. Delivered a comprehensive website and branding package that has significantly improved our digital presence.</p>
+                    <div class="testimonial-card__author">
+                        <div class="testimonial-card__author-info">
+                            <span class="testimonial-card__name">Long-term Collaborator</span>
+                            <span class="testimonial-card__role">E-Commerce & Retail</span>
                         </div>
                     </div>
                 </div>
@@ -425,127 +600,42 @@ $publicCategories = $projectService->getPublishedCategories();
         </div>
     </section>
 
-    <!-- Services Section -->
-    <section class="services" id="services">
+    <!-- Additional Information Section -->
+    <section class="additional-info" id="additional-info">
         <div class="container">
-            <div class="section-header">
-                <span class="section-tag">What I Do</span>
-                <h2 class="section-title">Services I Offer</h2>
-                <p class="section-desc">Delivering comprehensive digital solutions tailored to your unique needs</p>
-            </div>
-            <div class="services-grid">
-                <div class="service-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="service-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                        </svg>
-                    </div>
-                    <h3 class="service-title">UI/UX Design</h3>
-                    <p class="service-desc">Creating intuitive, user-centered interfaces that balance aesthetics with
-                        functionality for seamless digital experiences.</p>
-                    <div class="service-arrow">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
-                    </div>
+            <div class="additional-info__grid">
+                <div class="additional-info__left">
+                    <span class="section-tag">Working With Me</span>
+                    <h2 class="additional-info__title">How I Collaborate</h2>
+                    <p class="additional-info__desc">I work as an independent designer and collaborate directly with founders, marketers, and small teams. Long-term collaborations are very welcome.</p>
                 </div>
-                <div class="service-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="service-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="16 18 22 12 16 6"></polyline>
-                            <polyline points="8 6 2 12 8 18"></polyline>
-                        </svg>
+                <div class="additional-info__right">
+                    <div class="info-item">
+                        <div class="info-item__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                        <div>
+                            <h4 class="info-item__title">Async & Flexible</h4>
+                            <p class="info-item__text">Comfortable working asynchronously, with clear deadlines and regular check-ins.</p>
+                        </div>
                     </div>
-                    <h3 class="service-title">Web Development</h3>
-                    <p class="service-desc">Building responsive, high-performance websites using modern technologies for
-                        optimal user engagement.</p>
-                    <div class="service-arrow">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
+                    <div class="info-item">
+                        <div class="info-item__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="info-item__title">Clear Communication</h4>
+                            <p class="info-item__text">Via Slack, email, or Notion — whatever works best for your team.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="service-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="service-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"></path>
-                        </svg>
-                    </div>
-                    <h3 class="service-title">Graphic Design</h3>
-                    <p class="service-desc">Crafting compelling visual identities that communicate your brand story
-                        effectively across all platforms.</p>
-                    <div class="service-arrow">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
-                    </div>
-                </div>
-                <div class="service-card" data-aos="fade-up" data-aos-delay="400">
-                    <div class="service-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                            <path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"></path>
-                        </svg>
-                    </div>
-                    <h3 class="service-title">Motion Graphics</h3>
-                    <p class="service-desc">Bringing ideas to life through captivating animations and video content that
-                        engage and convert.</p>
-                    <div class="service-arrow">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
-                    </div>
-                </div>
-                <div class="service-card" data-aos="fade-up" data-aos-delay="500">
-                    <div class="service-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="M21 21l-4.35-4.35"></path>
-                        </svg>
-                    </div>
-                    <h3 class="service-title">SEO & Marketing</h3>
-                    <p class="service-desc">Amplifying your digital presence with data-driven strategies that drive
-                        traffic and generate leads.</p>
-                    <div class="service-arrow">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
-                    </div>
-                </div>
-                <div class="service-card" data-aos="fade-up" data-aos-delay="600">
-                    <div class="service-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon
-                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                            </polygon>
-                        </svg>
-                    </div>
-                    <h3 class="service-title">Branding</h3>
-                    <p class="service-desc">Building memorable brand experiences with strategic identity design that
-                        resonates with your audience.</p>
-                    <div class="service-arrow">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
+                    <div class="info-item">
+                        <div class="info-item__icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="info-item__title">India-Based, Global Clients</h4>
+                            <p class="info-item__text">Based in Chandigarh, regularly working with US and EU clients with good time overlap.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -607,9 +697,15 @@ $publicCategories = $projectService->getPublishedCategories();
                         $gradient = $gradients[$catSlug] ?? 'linear-gradient(135deg, #0f172a 0%, #334155 50%, #1e293b 100%)';
                     ?>
                         <article class="work-v2__card<?= $isFeaturedCard ? ' work-v2__card--featured' : '' ?>" data-category="<?= $catSlug ?>">
-                            <?php if (!empty($heroImage)): ?>
+                            <?php 
+                            $heroImageUrl = project_image_url($heroImage);
+                            ?>
+                            <?php if (!empty($heroImageUrl)): ?>
                                 <div class="work-v2__card-image">
-                                    <img src="<?= htmlspecialchars($heroImage) ?>" alt="<?= $title ?> Ã¢â‚¬â€ Project by Nitin Kumar" loading="lazy">
+                                    <img src="<?= htmlspecialchars($heroImageUrl) ?>" alt="<?= $title ?> — Project by Nitin Kumar" loading="lazy" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                    <div class="work-v2__card-image work-v2__card-image--placeholder" style="display: none; background: <?= $gradient ?>; width: 100%; height: 100%;">
+                                        <span class="work-v2__placeholder-text"><?= $title ?></span>
+                                    </div>
                                 </div>
                             <?php else: ?>
                                 <div class="work-v2__card-image work-v2__card-image--placeholder" style="background: <?= $gradient ?>;">

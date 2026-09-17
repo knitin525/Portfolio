@@ -153,17 +153,48 @@ $categories = $projectService->getCategories();
                     </tr>
                 <?php else: ?>
                     <?php foreach ($projects as $project): ?>
+                        <?php
+                        $imgUrl = project_image_url($project['hero_image'] ?? null, true);
+                        $hasImage = !empty($imgUrl);
+                        ?>
                         <tr style="border-bottom: 1px solid var(--admin-border); transition: background 0.15s ease;" onmouseover="this.style.background='var(--admin-border-light)'" onmouseout="this.style.background='transparent'">
-                            <!-- Project Title & Subtitle -->
+                            <!-- Project Title & Subtitle with Interactive Icon -->
                             <td style="padding: 14px 16px;">
                                 <div style="display: flex; align-items: center; gap: 12px;">
-                                    <?php if (!empty($project['hero_image'])): ?>
-                                        <img src="<?= htmlspecialchars($project['hero_image']) ?>" alt="" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid var(--admin-border);">
-                                    <?php else: ?>
-                                        <div style="width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #1e293b, #334155); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">
-                                            <?= htmlspecialchars(strtoupper(substr($project['title'], 0, 2))) ?>
+                                    <div class="project-icon-wrapper" 
+                                         id="icon-wrapper-<?= $project['id'] ?>"
+                                         onclick="openIconUploadModal(<?= $project['id'] ?>, '<?= htmlspecialchars(addslashes($project['title'])) ?>', '<?= htmlspecialchars(addslashes($imgUrl)) ?>')"
+                                         title="Click to upload / change icon"
+                                         style="position: relative; width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0; cursor: pointer; overflow: hidden;">
+                                        
+                                        <?php if ($hasImage): ?>
+                                            <img src="<?= htmlspecialchars($imgUrl) ?>" 
+                                                 alt="<?= htmlspecialchars($project['title']) ?>" 
+                                                 id="table-icon-img-<?= $project['id'] ?>"
+                                                 style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid var(--admin-border); display: block;"
+                                                 onerror="this.style.display='none'; document.getElementById('table-icon-badge-<?= $project['id'] ?>').style.display='flex';">
+                                            <div id="table-icon-badge-<?= $project['id'] ?>" 
+                                                 style="display: none; width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #1e293b, #334155); color: #fff; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; border: 1px solid var(--admin-border);">
+                                                <?= htmlspecialchars(strtoupper(substr($project['title'], 0, 2))) ?>
+                                            </div>
+                                        <?php else: ?>
+                                            <div id="table-icon-badge-<?= $project['id'] ?>" 
+                                                 style="display: flex; width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #1e293b, #334155); color: #fff; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; border: 1px solid var(--admin-border);">
+                                                <?= htmlspecialchars(strtoupper(substr($project['title'], 0, 2))) ?>
+                                            </div>
+                                            <img src="" 
+                                                 alt="" 
+                                                 id="table-icon-img-<?= $project['id'] ?>"
+                                                 style="display: none; width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid var(--admin-border);">
+                                        <?php endif; ?>
+
+                                        <!-- Hover Overlay: Camera / Upload Indicator -->
+                                        <div class="project-icon-overlay" 
+                                             style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.72); border-radius: 8px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; color: #fff;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                                         </div>
-                                    <?php endif; ?>
+                                    </div>
+
                                     <div>
                                         <a href="project-edit.php?id=<?= $project['id'] ?>" style="font-weight: 600; color: var(--admin-text); text-decoration: none;">
                                             <?= htmlspecialchars($project['title']) ?>
@@ -232,6 +263,14 @@ $categories = $projectService->getCategories();
                             <!-- Actions -->
                             <td style="padding: 14px 16px; text-align: right; white-space: nowrap;">
                                 <div style="display: inline-flex; gap: 6px;">
+                                    <button type="button" 
+                                            class="btn btn-secondary btn-sm" 
+                                            style="padding: 6px 10px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px;" 
+                                            title="Upload or Change Project Icon"
+                                            onclick="openIconUploadModal(<?= $project['id'] ?>, '<?= htmlspecialchars(addslashes($project['title'])) ?>', '<?= htmlspecialchars(addslashes($imgUrl)) ?>')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                        <span>Icon</span>
+                                    </button>
                                     <a href="project-edit.php?id=<?= $project['id'] ?>" class="btn btn-secondary btn-sm" style="padding: 6px 10px; font-size: 0.8rem;" title="Edit Project">
                                         Edit
                                     </a>
@@ -255,5 +294,320 @@ $categories = $projectService->getCategories();
         </table>
     </div>
 </div>
+
+<style>
+.project-icon-wrapper:hover .project-icon-overlay {
+    opacity: 1 !important;
+}
+.icon-dropzone.dragover {
+    border-color: var(--admin-primary) !important;
+    background: rgba(37, 99, 235, 0.08) !important;
+}
+</style>
+
+<!-- Modal: Upload / Change Project Icon -->
+<div id="iconUploadModal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: 12px; width: 100%; max-width: 480px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.15); overflow: hidden;">
+        
+        <!-- Modal Header -->
+        <div style="padding: 18px 22px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--admin-text); margin: 0;">Upload Project Icon</h3>
+                <p id="modalProjectTitle" style="font-size: 0.85rem; color: var(--admin-text-muted); margin: 3px 0 0 0;"></p>
+            </div>
+            <button type="button" onclick="closeIconUploadModal()" aria-label="Close" style="background: none; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--admin-text-muted); padding: 4px;">&times;</button>
+        </div>
+
+        <!-- Modal Body -->
+        <div style="padding: 22px;">
+            <div id="modalAlertBox" style="display: none; padding: 10px 14px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 16px;"></div>
+
+            <!-- Preview Section -->
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; background: var(--admin-border-light); padding: 14px; border-radius: 8px; border: 1px solid var(--admin-border);">
+                <div style="width: 64px; height: 64px; border-radius: 10px; overflow: hidden; border: 1px solid var(--admin-border); background: #0f172a; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <img id="modalIconPreview" src="" alt="Icon Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                    <div id="modalIconFallback" style="display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; color: #fff; background: linear-gradient(135deg, #1e293b, #334155);">
+                        --
+                    </div>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 0.9rem; font-weight: 600; color: var(--admin-text); margin-bottom: 2px;">Project Icon &amp; Thumbnail</div>
+                    <div style="font-size: 0.8rem; color: var(--admin-text-muted);">Shown in projects showcase, table listings, and hero cards. Square ratio recommended (e.g. 512×512px).</div>
+                </div>
+            </div>
+
+            <!-- Drag & Drop Zone -->
+            <div id="iconDropzone" class="icon-dropzone" style="border: 2px dashed var(--admin-border); border-radius: 10px; padding: 24px 16px; text-align: center; cursor: pointer; transition: all 0.2s ease; background: var(--admin-surface); margin-bottom: 16px;" onclick="document.getElementById('modalFileInput').click()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color: var(--admin-primary); margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <div style="font-size: 0.9rem; font-weight: 600; color: var(--admin-text); margin-bottom: 4px;">Click to browse or drag &amp; drop icon</div>
+                <div style="font-size: 0.78rem; color: var(--admin-text-muted);">Supports PNG, JPG, WEBP, SVG, GIF (Max 10MB)</div>
+                <input type="file" id="modalFileInput" accept="image/*" style="display: none;" onchange="handleModalFileSelect(this)">
+            </div>
+
+            <div id="selectedFileInfo" style="display: none; align-items: center; justify-content: space-between; background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.25); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; color: var(--admin-primary); margin-bottom: 16px;">
+                <span id="selectedFileName" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 320px;"></span>
+                <button type="button" onclick="clearSelectedFile()" style="background: none; border: none; color: var(--admin-danger); cursor: pointer; font-size: 1.1rem; line-height: 1;">&times;</button>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div style="padding: 14px 22px; border-top: 1px solid var(--admin-border); background: var(--admin-border-light); display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" id="btnRemoveIcon" onclick="removeProjectIcon()" class="btn btn-sm" style="display: none; background: transparent; color: var(--admin-danger); border: 1px solid rgba(239, 68, 68, 0.3);">
+                Remove Current Icon
+            </button>
+            <div style="display: flex; gap: 8px; margin-left: auto;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="closeIconUploadModal()">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btnSubmitUpload" onclick="uploadProjectIcon()" disabled style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span id="btnUploadText">Save Icon</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+let currentModalProjectId = 0;
+let currentModalProjectTitle = '';
+let currentModalOriginalImage = '';
+let selectedModalFile = null;
+
+function openIconUploadModal(projectId, title, currentImgUrl) {
+    currentModalProjectId = projectId;
+    currentModalProjectTitle = title;
+    currentModalOriginalImage = currentImgUrl || '';
+    selectedModalFile = null;
+
+    document.getElementById('modalProjectTitle').textContent = title;
+    const alertBox = document.getElementById('modalAlertBox');
+    alertBox.style.display = 'none';
+    alertBox.textContent = '';
+
+    const preview = document.getElementById('modalIconPreview');
+    const fallback = document.getElementById('modalIconFallback');
+    const initials = title.trim().substring(0, 2).toUpperCase() || 'PR';
+    fallback.textContent = initials;
+
+    if (currentModalOriginalImage) {
+        preview.src = currentModalOriginalImage;
+        preview.style.display = 'block';
+        fallback.style.display = 'none';
+        preview.onerror = function() {
+            preview.style.display = 'none';
+            fallback.style.display = 'flex';
+        };
+        document.getElementById('btnRemoveIcon').style.display = 'inline-block';
+    } else {
+        preview.style.display = 'none';
+        fallback.style.display = 'flex';
+        document.getElementById('btnRemoveIcon').style.display = 'none';
+    }
+
+    document.getElementById('modalFileInput').value = '';
+    document.getElementById('selectedFileInfo').style.display = 'none';
+    document.getElementById('btnSubmitUpload').disabled = true;
+
+    const modal = document.getElementById('iconUploadModal');
+    modal.style.display = 'flex';
+}
+
+function closeIconUploadModal() {
+    document.getElementById('iconUploadModal').style.display = 'none';
+}
+
+function handleModalFileSelect(input) {
+    if (input.files && input.files[0]) {
+        setModalFile(input.files[0]);
+    }
+}
+
+function setModalFile(file) {
+    selectedModalFile = file;
+    document.getElementById('selectedFileName').textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+    document.getElementById('selectedFileInfo').style.display = 'flex';
+    document.getElementById('btnSubmitUpload').disabled = false;
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const preview = document.getElementById('modalIconPreview');
+        const fallback = document.getElementById('modalIconFallback');
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+        fallback.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearSelectedFile() {
+    selectedModalFile = null;
+    document.getElementById('modalFileInput').value = '';
+    document.getElementById('selectedFileInfo').style.display = 'none';
+    document.getElementById('btnSubmitUpload').disabled = true;
+
+    const preview = document.getElementById('modalIconPreview');
+    const fallback = document.getElementById('modalIconFallback');
+    if (currentModalOriginalImage) {
+        preview.src = currentModalOriginalImage;
+        preview.style.display = 'block';
+        fallback.style.display = 'none';
+    } else {
+        preview.style.display = 'none';
+        fallback.style.display = 'flex';
+    }
+}
+
+// Drag & drop handlers
+document.addEventListener('DOMContentLoaded', () => {
+    const dropzone = document.getElementById('iconDropzone');
+    if (!dropzone) return;
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.add('dragover');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove('dragover');
+        }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length > 0) {
+            setModalFile(files[0]);
+        }
+    }, false);
+
+    // Escape key closes modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeIconUploadModal();
+        }
+    });
+
+    // Close when clicking modal backdrop
+    const modal = document.getElementById('iconUploadModal');
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeIconUploadModal();
+        }
+    });
+});
+
+async function uploadProjectIcon() {
+    if (!selectedModalFile || !currentModalProjectId) return;
+
+    const btn = document.getElementById('btnSubmitUpload');
+    const btnText = document.getElementById('btnUploadText');
+    const alertBox = document.getElementById('modalAlertBox');
+
+    btn.disabled = true;
+    btnText.textContent = 'Uploading...';
+    alertBox.style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('action', 'upload_project_icon');
+    formData.append('project_id', currentModalProjectId);
+    formData.append('icon_file', selectedModalFile);
+    formData.append('csrf_token', '<?= csrf_token() ?>');
+
+    try {
+        const response = await fetch('ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            alertBox.style.display = 'block';
+            alertBox.style.background = 'rgba(16, 185, 129, 0.12)';
+            alertBox.style.border = '1px solid var(--admin-success)';
+            alertBox.style.color = '#065f46';
+            alertBox.textContent = result.message || 'Icon uploaded successfully!';
+
+            // Live update the table row without page refresh
+            const tableImg = document.getElementById('table-icon-img-' + currentModalProjectId);
+            const tableBadge = document.getElementById('table-icon-badge-' + currentModalProjectId);
+            if (tableImg) {
+                tableImg.src = result.display_url + '?t=' + Date.now();
+                tableImg.style.display = 'block';
+                if (tableBadge) tableBadge.style.display = 'none';
+            }
+
+            setTimeout(() => {
+                closeIconUploadModal();
+            }, 1200);
+        } else {
+            alertBox.style.display = 'block';
+            alertBox.style.background = 'rgba(239, 68, 68, 0.12)';
+            alertBox.style.border = '1px solid var(--admin-danger)';
+            alertBox.style.color = '#991b1b';
+            alertBox.textContent = result.message || 'Failed to upload icon.';
+            btn.disabled = false;
+            btnText.textContent = 'Save Icon';
+        }
+    } catch (err) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(239, 68, 68, 0.12)';
+        alertBox.style.border = '1px solid var(--admin-danger)';
+        alertBox.style.color = '#991b1b';
+        alertBox.textContent = 'Network or server error occurred during upload.';
+        btn.disabled = false;
+        btnText.textContent = 'Save Icon';
+    }
+}
+
+async function removeProjectIcon() {
+    if (!currentModalProjectId || !confirm('Are you sure you want to remove the icon for this project?')) return;
+
+    const alertBox = document.getElementById('modalAlertBox');
+    const formData = new FormData();
+    formData.append('action', 'remove_project_icon');
+    formData.append('project_id', currentModalProjectId);
+    formData.append('csrf_token', '<?= csrf_token() ?>');
+
+    try {
+        const response = await fetch('ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            // Live update table row
+            const tableImg = document.getElementById('table-icon-img-' + currentModalProjectId);
+            const tableBadge = document.getElementById('table-icon-badge-' + currentModalProjectId);
+            if (tableImg) {
+                tableImg.style.display = 'none';
+                tableImg.src = '';
+            }
+            if (tableBadge) {
+                tableBadge.style.display = 'flex';
+            }
+            closeIconUploadModal();
+        } else {
+            alertBox.style.display = 'block';
+            alertBox.style.background = 'rgba(239, 68, 68, 0.12)';
+            alertBox.style.border = '1px solid var(--admin-danger)';
+            alertBox.style.color = '#991b1b';
+            alertBox.textContent = result.message || 'Failed to remove icon.';
+        }
+    } catch (err) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(239, 68, 68, 0.12)';
+        alertBox.style.border = '1px solid var(--admin-danger)';
+        alertBox.style.color = '#991b1b';
+        alertBox.textContent = 'Network error occurred.';
+    }
+}
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
